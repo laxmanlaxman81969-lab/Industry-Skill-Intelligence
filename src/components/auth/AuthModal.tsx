@@ -195,7 +195,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="flex items-center space-x-2">
               <Sparkles className="w-4 h-4 text-teal-400" />
               <span className="text-xs text-slate-300">
-                Evaluating for SIH 2026? Use Instant 1-Click Access:
+                Platform Demonstration Review? Use Instant 1-Click Access:
               </span>
             </div>
             <button

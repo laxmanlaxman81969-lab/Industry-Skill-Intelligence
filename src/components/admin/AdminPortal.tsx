@@ -159,7 +159,7 @@ export const AdminPortal: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-400">
-            Per SIH Problem Statement guidelines: "Never present invented statistics as real-world statistics. Clearly label prototype data."
+            Data Governance Standard: "Never present invented statistics as real-world statistics. Clearly label prototype benchmark data."
           </p>
         </div>
 

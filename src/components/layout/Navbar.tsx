@@ -43,8 +43,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-teal-300 transition-colors">
                   AI Industry Skill Gap & Curriculum Platform
                 </span>
-                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                  SIH 2026
+                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20 font-mono">
+                  Enterprise Platform
                 </span>
               </div>
               <p className="hidden sm:block text-[11px] text-slate-400 font-medium">

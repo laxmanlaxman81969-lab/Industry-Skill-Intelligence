@@ -17,10 +17,10 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Real-world career intelligence platform connecting Students, Colleges, Companies, and Industry Demand for Smart India Hackathon 2026.
+              Enterprise career intelligence platform connecting Students, Colleges, Companies, and Real-Time Industry Demand.
             </p>
             <div className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-mono bg-teal-500/10 text-teal-300 border border-teal-500/20">
-              Problem Statement: SIH26134
+              Higher Education & Industry Workforce Platform
             </div>
           </div>
 
@@ -74,7 +74,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="pt-8 border-t border-slate-900/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© 2026 AI-Powered Industry Skill Gap & Curriculum Alignment Platform. Smart India Hackathon 2026 Prototype.</p>
+          <p>© 2026 AI-Powered Industry Skill Gap & Curriculum Alignment Platform. All rights reserved.</p>
           <div className="flex items-center space-x-4 mt-4 sm:mt-0">
             <span>Prototype / Sample Industry Data Engine</span>
             <span>Privacy & Integrity Framework</span>

@@ -115,7 +115,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-medium">
               <Sparkles className="w-3.5 h-3.5 text-teal-400" />
-              <span>Smart India Hackathon 2026 • Problem Statement SIH26134</span>
+              <span>Next-Gen Career Intelligence & Academic Alignment Platform</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
