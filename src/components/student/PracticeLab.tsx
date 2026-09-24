@@ -63,27 +63,27 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
   };
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* HEADER BAR (PART 17) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-slate-900 border border-slate-800">
+    <div className="space-y-6 pb-12 max-w-6xl">
+      {/* HEADER BAR */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-teal-400 font-semibold">
-              Part 17 & 18 Lab
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+              Skill Verification Lab
             </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-xs text-slate-400">Target Role: {studentProfile.targetRole}</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-xs text-slate-500">Target Role: <strong className="text-slate-800">{studentProfile.targetRole}</strong></span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Skill Practice Lab
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300">
+          <p className="text-xs sm:text-sm text-slate-500">
             Solve real-world coding problems triggered by identified skill gaps. Submissions are evaluated by AI across 4 technical rubrics.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs font-mono px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-teal-400">
-          <Sparkles className="w-4 h-4 text-teal-400" />
+        <div className="flex items-center space-x-2 text-xs font-semibold px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700">
+          <Sparkles className="w-4 h-4 text-blue-600" />
           <span>AI Code Evaluation Active</span>
         </div>
       </div>
@@ -92,7 +92,7 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: Available Gap Assignments */}
         <div className="lg:col-span-4 space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Gap-Triggered Assignments ({assignments.length})
           </h3>
 
@@ -105,23 +105,23 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
                   onClick={() => handleSelectAssignment(asg)}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-slate-900 border-teal-500/50 shadow-lg shadow-teal-500/10'
-                      : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
+                      ? 'bg-white border-blue-400 shadow-sm ring-2 ring-blue-50'
+                      : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-xs'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-teal-400 border border-slate-700">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                       {asg.targetSkill}
                     </span>
                     {asg.completed && (
-                      <span className="inline-flex items-center space-x-1 text-emerald-400 text-[10px] font-bold">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center space-x-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-200">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Score: {asg.score}%</span>
                       </span>
                     )}
                   </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-white mb-1">{asg.title}</h4>
-                  <div className="flex items-center space-x-2 text-[11px] text-slate-400">
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-1">{asg.title}</h4>
+                  <div className="flex items-center space-x-2 text-[11px] text-slate-500">
                     <span>{asg.difficulty}</span>
                     <span>•</span>
                     <span>Est. {asg.estimatedMinutes} mins</span>
@@ -132,12 +132,12 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
           </div>
 
           {/* Feedback loop indicator */}
-          <div className="p-4 rounded-2xl bg-teal-950/20 border border-teal-500/20 text-xs text-slate-300 space-y-1.5">
-            <p className="font-bold text-teal-300 flex items-center space-x-1.5">
-              <TrendingUp className="w-4 h-4" />
+          <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-200/80 text-xs text-slate-700 space-y-1.5">
+            <p className="font-bold text-blue-700 flex items-center space-x-1.5">
+              <TrendingUp className="w-4 h-4 text-blue-600" />
               <span>Roadmap Feedback Loop</span>
             </p>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-slate-600 leading-relaxed">
               Completing this assignment updates your verified {activeAssignment.targetSkill} proficiency, recalculates readiness, and unlocks next roadmap stages.
             </p>
           </div>
@@ -146,32 +146,32 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
         {/* RIGHT COLUMN: Assignment Instructions, Code Editor, Evaluation */}
         <div className="lg:col-span-8 space-y-6">
           {/* Assignment Overview */}
-          <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div>
-                <span className="text-[10px] font-mono text-teal-400 uppercase font-semibold">
+                <span className="text-[10px] text-blue-600 uppercase font-semibold">
                   Required Skill Gap Challenge
                 </span>
-                <h2 className="text-xl font-bold text-white mt-0.5">{activeAssignment.title}</h2>
+                <h2 className="text-xl font-bold text-slate-900 mt-0.5">{activeAssignment.title}</h2>
               </div>
-              <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 self-start sm:self-auto">
+              <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 self-start sm:self-auto">
                 Difficulty: {activeAssignment.difficulty}
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               {activeAssignment.description}
             </p>
 
             {/* Requirements Checklist */}
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-              <h4 className="text-xs font-bold text-slate-200 uppercase font-mono tracking-wider">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Specification Requirements:
               </h4>
-              <ul className="space-y-1.5 text-xs text-slate-400">
+              <ul className="space-y-1.5 text-xs text-slate-600">
                 {activeAssignment.requirements.map((req, i) => (
                   <li key={i} className="flex items-start space-x-2">
-                    <span className="text-teal-400 font-bold shrink-0">✓</span>
+                    <span className="text-emerald-600 font-bold shrink-0">✓</span>
                     <span>{req}</span>
                   </li>
                 ))}
@@ -180,9 +180,9 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
 
             {/* Skills Tested */}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-xs text-slate-400 font-medium mr-1">Skills Tested:</span>
+              <span className="text-xs text-slate-500 font-medium mr-1">Skills Tested:</span>
               {activeAssignment.skillsTested.map((s) => (
-                <span key={s} className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300">
+                <span key={s} className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                   {s}
                 </span>
               ))}
@@ -190,15 +190,15 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
           </div>
 
           {/* CODE EDITOR & REPO SUBMISSION FORM */}
-          <form onSubmit={handleRunEvaluation} className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <form onSubmit={handleRunEvaluation} className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <FileCode className="w-4 h-4 text-teal-400" />
-                <span className="text-xs font-bold text-white font-mono">
+                <FileCode className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-bold text-slate-900">
                   Solution Code (Java / Spring / SQL)
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-mono">
+              <span className="text-[10px] text-slate-400 font-mono">
                 Syntax Highlighted Simulation
               </span>
             </div>
@@ -208,12 +208,12 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
               value={userCode}
               onChange={(e) => setUserCode(e.target.value)}
               placeholder="// Type or paste your code solution here..."
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-mono text-xs focus:border-teal-500 focus:outline-none leading-relaxed resize-y"
+              className="w-full p-4 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xs focus:border-blue-600 focus:bg-white focus:outline-none leading-relaxed resize-y"
             />
 
             {/* Optional GitHub Repo Link */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1 flex items-center space-x-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center space-x-1.5">
                 <FolderGit2 className="w-4 h-4 text-slate-400" />
                 <span>GitHub Repository URL (Optional for full project evaluation)</span>
               </label>
@@ -222,19 +222,19 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
                 placeholder="https://github.com/username/student-management-api"
-                className="w-full px-3.5 py-2 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-teal-500 focus:outline-none"
+                className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:border-blue-600 focus:outline-none"
               />
             </div>
 
             {/* Submit Button */}
             <div className="flex items-center justify-between pt-2">
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-slate-500">
                 Evaluation checks correctness, concept understanding, code quality & problem solving.
               </span>
               <button
                 type="submit"
                 disabled={isSubmitting || userCode.trim().length < 10}
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-teal-400 text-slate-950 font-bold text-xs hover:bg-teal-300 disabled:opacity-50 transition-all shadow-md shadow-teal-500/20"
+                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 disabled:opacity-50 transition-all shadow-xs"
               >
                 <span>{isSubmitting ? 'Evaluating Code with AI...' : 'Submit Code for AI Grading'}</span>
                 <Play className="w-3.5 h-3.5 fill-current" />
@@ -243,24 +243,24 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
           </form>
 
           {/* ========================================================================= */}
-          {/* AI EVALUATION REPORT (PART 18 SPEC) */}
+          {/* AI EVALUATION REPORT */}
           {/* ========================================================================= */}
           {submissionFeedback && (
-            <div className="p-6 rounded-3xl bg-slate-900 border border-teal-500/40 space-y-6 animate-fade-in shadow-2xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+            <div className="p-6 rounded-2xl bg-white border border-blue-200 space-y-6 animate-fade-in shadow-md">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div className="space-y-1">
-                  <span className="text-xs font-mono uppercase text-teal-400 font-semibold">
-                    Part 18 Transparent Evaluation
+                  <span className="text-[11px] uppercase text-blue-600 font-semibold">
+                    Transparent Evaluation
                   </span>
-                  <h3 className="text-lg font-bold text-white flex items-center space-x-2">
-                    <Award className="w-5 h-5 text-teal-400" />
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                    <Award className="w-5 h-5 text-blue-600" />
                     <span>Assignment Grading Report</span>
                   </h3>
                 </div>
 
                 <div className="flex items-baseline space-x-1.5">
-                  <span className="text-xs text-slate-400 font-mono">OVERALL SCORE:</span>
-                  <span className="text-3xl font-black text-teal-300">
+                  <span className="text-xs text-slate-500 font-medium">OVERALL SCORE:</span>
+                  <span className="text-3xl font-black text-blue-600">
                     {Math.round(
                       (submissionFeedback.technicalCorrectness +
                         submissionFeedback.conceptUnderstanding +
@@ -275,41 +275,41 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
 
               {/* 4 Rubric Metric Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-[10px] text-slate-400">Technical Correctness</span>
-                  <p className="text-base font-bold text-teal-300 mt-0.5">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase">Technical Correctness</span>
+                  <p className="text-base font-bold text-blue-600 mt-0.5">
                     {submissionFeedback.technicalCorrectness} / 100
                   </p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-[10px] text-slate-400">Concept Understanding</span>
-                  <p className="text-base font-bold text-emerald-300 mt-0.5">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase">Concept Understanding</span>
+                  <p className="text-base font-bold text-emerald-600 mt-0.5">
                     {submissionFeedback.conceptUnderstanding} / 100
                   </p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-[10px] text-slate-400">Code Quality</span>
-                  <p className="text-base font-bold text-white mt-0.5">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase">Code Quality</span>
+                  <p className="text-base font-bold text-slate-900 mt-0.5">
                     {submissionFeedback.codeQuality} / 100
                   </p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-[10px] text-slate-400">Problem Solving</span>
-                  <p className="text-base font-bold text-amber-300 mt-0.5">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-semibold text-slate-500 uppercase">Problem Solving</span>
+                  <p className="text-base font-bold text-amber-600 mt-0.5">
                     {submissionFeedback.problemSolving} / 100
                   </p>
                 </div>
               </div>
 
-              {/* 3 Categories: What you did well, What to improve, What to learn next (Part 18 Spec) */}
+              {/* 3 Categories: What you did well, What to improve, What to learn next */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                 {/* What you did well */}
-                <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/20 space-y-2">
-                  <h4 className="font-bold text-emerald-400 uppercase font-mono text-[10px] flex items-center space-x-1.5">
+                <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/80 space-y-2">
+                  <h4 className="font-bold text-emerald-700 uppercase text-[10px] flex items-center space-x-1.5">
                     <Check className="w-3.5 h-3.5" />
                     <span>What You Did Well</span>
                   </h4>
-                  <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                  <ul className="space-y-1.5 text-slate-700 text-[11px]">
                     {submissionFeedback.whatYouDidWell.map((item, i) => (
                       <li key={i}>• {item}</li>
                     ))}
@@ -317,12 +317,12 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
                 </div>
 
                 {/* What to improve */}
-                <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/20 space-y-2">
-                  <h4 className="font-bold text-amber-400 uppercase font-mono text-[10px] flex items-center space-x-1.5">
+                <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-2">
+                  <h4 className="font-bold text-amber-700 uppercase text-[10px] flex items-center space-x-1.5">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>What You Need to Improve</span>
                   </h4>
-                  <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                  <ul className="space-y-1.5 text-slate-700 text-[11px]">
                     {submissionFeedback.whatToImprove.map((item, i) => (
                       <li key={i}>• {item}</li>
                     ))}
@@ -330,12 +330,12 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
                 </div>
 
                 {/* What to learn next */}
-                <div className="p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/20 space-y-2">
-                  <h4 className="font-bold text-indigo-400 uppercase font-mono text-[10px] flex items-center space-x-1.5">
+                <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200/80 space-y-2">
+                  <h4 className="font-bold text-indigo-700 uppercase text-[10px] flex items-center space-x-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>What to Learn Next</span>
                   </h4>
-                  <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                  <ul className="space-y-1.5 text-slate-700 text-[11px]">
                     {submissionFeedback.whatToLearnNext.map((item, i) => (
                       <li key={i}>• {item}</li>
                     ))}
@@ -345,12 +345,12 @@ export const PracticeLab: React.FC<PracticeLabProps> = ({ onNavigateToRoadmap })
 
               {/* Action */}
               <div className="pt-2 flex items-center justify-between">
-                <span className="text-xs text-teal-400 font-semibold">
+                <span className="text-xs text-emerald-700 font-semibold">
                   Skill "{activeAssignment.targetSkill}" updated to Verified in your profile!
                 </span>
                 <button
                   onClick={onNavigateToRoadmap}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-teal-400 text-slate-950 font-bold text-xs hover:bg-teal-300 transition-all shadow-md"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-all shadow-xs"
                 >
                   <span>Return to Career Growth Roadmap</span>
                   <ArrowRight className="w-4 h-4" />

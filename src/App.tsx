@@ -3,31 +3,67 @@ import { useApp, AppProvider } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { LandingPage } from './components/landing/LandingPage';
-import { AuthModal } from './components/auth/AuthModal';
+import { LoginPage } from './components/auth/LoginPage';
 import { StudentOnboarding } from './components/student/onboarding/StudentOnboarding';
-import { StudentDashboard } from './components/student/StudentDashboard';
-import { SkillGapAnalyzer } from './components/student/SkillGapAnalyzer';
-import { SkillGapPage } from './components/student/SkillGapPage';
-import { CareerRoadmap } from './components/student/CareerRoadmap';
-import { PracticeLab } from './components/student/PracticeLab';
-import { MockInterview } from './components/student/MockInterview';
-import { OpportunityRadar } from './components/student/OpportunityRadar';
+import { StudentPortal } from './components/student/StudentPortal';
 import { CompanyPortal } from './components/company/CompanyPortal';
 import { CollegePortal } from './components/college/CollegePortal';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { UserRole } from './types';
+import { AuthService } from './services/auth';
 
 function AppContent() {
-  const { currentUser, studentProfile, setStudentProfile } = useApp();
+  const { currentUser, studentProfile, logout } = useApp();
 
-  const [activeView, setActiveView] = useState<string>('landing');
-  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [activeView, setActiveView] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+      return 'login';
+    }
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/roadmap')) {
+      return 'roadmap';
+    }
+    const session = AuthService.getInstance().getCurrentSession();
+    if (session?.user) {
+      if (session.user.role === 'student') return 'student-dashboard';
+      if (session.user.role === 'company') return 'company-portal';
+      if (session.user.role === 'college') return 'college-portal';
+      if (session.user.role === 'admin') return 'admin-portal';
+    }
+    return 'landing';
+  });
   const [authDefaultRole, setAuthDefaultRole] = useState<UserRole>('student');
 
-  // Open auth modal with specific role pre-selected
+  // Handle browser back / forward navigation
+  React.useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setActiveView(event.state.view);
+        return;
+      }
+      const path = window.location.pathname;
+      if (path === '/login') {
+        setActiveView('login');
+      } else if (path === '/' || path === '') {
+        setActiveView('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleOpenAuth = (role: UserRole = 'student') => {
     setAuthDefaultRole(role);
-    setAuthModalOpen(true);
+    setActiveView('login');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      window.history.pushState({ view: 'login' }, '', '/login');
+    }
+  };
+
+  const handleNavigateToHome = () => {
+    setActiveView('landing');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.history.pushState({ view: 'landing' }, '', '/');
+    }
   };
 
   const handleAuthSuccess = (role: UserRole) => {
@@ -44,28 +80,119 @@ function AppContent() {
     } else if (role === 'admin') {
       setActiveView('admin-portal');
     }
+    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+      window.history.pushState({ view: 'dashboard' }, '', '/');
+    }
   };
 
+  const handleLogout = () => {
+    logout();
+    handleNavigateToHome();
+  };
+
+  // Standalone login page (no navbar/footer)
+  if (activeView === 'login') {
+    return (
+      <LoginPage
+        defaultRole={authDefaultRole}
+        onBackToHome={handleNavigateToHome}
+        onSuccessNavigate={handleAuthSuccess}
+      />
+    );
+  }
+
+  const isStudentPortal =
+    currentUser?.role === 'student' &&
+    studentProfile.onboardingComplete &&
+    activeView !== 'landing' &&
+    activeView !== 'login' &&
+    activeView !== 'student-onboarding';
+
+  // Standalone Student Application View (NO landing page navbar or footer)
+  if (isStudentPortal) {
+    return (
+      <StudentPortal
+        activeView={activeView}
+        setActiveView={setActiveView}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  const isCompanyPortal =
+    currentUser?.role === 'company' &&
+    activeView !== 'landing' &&
+    activeView !== 'login';
+
+  // Standalone Company Application View (NO landing page navbar or footer)
+  if (isCompanyPortal) {
+    return (
+      <CompanyPortal
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  const isCollegePortal =
+    currentUser?.role === 'college' &&
+    activeView !== 'landing' &&
+    activeView !== 'login';
+
+  // Standalone College Application View (NO landing page navbar or footer)
+  if (isCollegePortal) {
+    return (
+      <CollegePortal onLogout={handleLogout} />
+    );
+  }
+
+  const isAdminPortal =
+    currentUser?.role === 'admin' &&
+    activeView !== 'landing' &&
+    activeView !== 'login';
+
+  // Standalone Admin Application View (NO landing page navbar or footer)
+  if (isAdminPortal) {
+    return (
+      <AdminPortal onLogout={handleLogout} />
+    );
+  }
+
+  // Student Onboarding View
+  if (currentUser?.role === 'student' && !studentProfile.onboardingComplete && activeView !== 'login') {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+        <main className="max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <StudentOnboarding
+            onComplete={() => setActiveView('student-dashboard')}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
       <Navbar
         onOpenAuth={handleOpenAuth}
         activeView={activeView}
-        setActiveView={setActiveView}
+        setActiveView={(view) => {
+          if (view === 'landing') {
+            handleNavigateToHome();
+          } else {
+            setActiveView(view);
+          }
+        }}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* STUDENT ONBOARDING (IF NOT COMPLETED) */}
-        {currentUser?.role === 'student' && !studentProfile.onboardingComplete && (
-          <StudentOnboarding
-            onComplete={() => {
-              setActiveView('student-dashboard');
-            }}
-          />
-        )}
-
-        {/* GUEST LANDING PAGE */}
-        {(activeView === 'landing' || (!currentUser && activeView !== 'landing')) && (
+      <main
+        className={`flex-1 ${
+          activeView === 'landing'
+            ? 'w-full'
+            : 'max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6'
+        }`}
+      >
+        {/* LANDING PAGE */}
+        {activeView === 'landing' && (
           <LandingPage
             onOpenAuth={handleOpenAuth}
             onNavigateToStudent={() => {
@@ -77,135 +204,9 @@ function AppContent() {
             }}
           />
         )}
-
-        {/* STUDENT PORTAL VIEWS */}
-        {currentUser?.role === 'student' && studentProfile.onboardingComplete && (
-          <>
-            {/* Student Navigation Sub-bar */}
-            <div className="mb-6 flex items-center space-x-1.5 overflow-x-auto pb-2 border-b border-slate-800 text-xs font-semibold">
-              <button
-                onClick={() => setActiveView('student-dashboard')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'student-dashboard'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                Dashboard (Industry Demand)
-              </button>
-              <button
-                onClick={() => setActiveView('gap-analyzer')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'gap-analyzer'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                AI Skill Gap Analyzer
-              </button>
-              <button
-                onClick={() => setActiveView('skill-gap-page')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'skill-gap-page'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                Your Skill Gap
-              </button>
-              <button
-                onClick={() => setActiveView('roadmap')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'roadmap'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                Career Growth Roadmap
-              </button>
-              <button
-                onClick={() => setActiveView('practice-lab')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'practice-lab'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                Skill Practice Lab
-              </button>
-              <button
-                onClick={() => setActiveView('mock-interview')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'mock-interview'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                AI Video Mock Interview
-              </button>
-              <button
-                onClick={() => setActiveView('opportunities')}
-                className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
-                  activeView === 'opportunities'
-                    ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
-                }`}
-              >
-                Opportunity Radar
-              </button>
-            </div>
-
-            {/* Active View Rendering */}
-            {activeView === 'student-dashboard' && (
-              <StudentDashboard onNavigate={(tab) => setActiveView(tab)} />
-            )}
-            {activeView === 'gap-analyzer' && (
-              <SkillGapAnalyzer onNavigateToRoadmap={() => setActiveView('roadmap')} />
-            )}
-            {activeView === 'skill-gap-page' && (
-              <SkillGapPage onNavigateToRoadmap={() => setActiveView('roadmap')} />
-            )}
-            {activeView === 'roadmap' && (
-              <CareerRoadmap
-                onNavigateToLab={() => setActiveView('practice-lab')}
-                onNavigateToInterview={() => setActiveView('mock-interview')}
-              />
-            )}
-            {activeView === 'practice-lab' && (
-              <PracticeLab onNavigateToRoadmap={() => setActiveView('roadmap')} />
-            )}
-            {activeView === 'mock-interview' && (
-              <MockInterview onNavigateToOpportunities={() => setActiveView('opportunities')} />
-            )}
-            {activeView === 'opportunities' && <OpportunityRadar />}
-          </>
-        )}
-
-        {/* COMPANY PORTAL */}
-        {currentUser?.role === 'company' && activeView === 'company-portal' && (
-          <CompanyPortal />
-        )}
-
-        {/* COLLEGE PORTAL */}
-        {currentUser?.role === 'college' && activeView === 'college-portal' && (
-          <CollegePortal />
-        )}
-
-        {/* ADMIN PORTAL */}
-        {currentUser?.role === 'admin' && activeView === 'admin-portal' && (
-          <AdminPortal />
-        )}
       </main>
 
       <Footer />
-
-      {/* MULTI-PORTAL AUTH MODAL */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        defaultRole={authDefaultRole}
-        onSuccessNavigate={handleAuthSuccess}
-      />
     </div>
   );
 }

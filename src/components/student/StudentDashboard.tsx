@@ -1,41 +1,82 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { SUPPORTED_ROLES, INDUSTRIES } from '../../data/seedData';
 import {
+  Briefcase,
+  ShieldCheck,
   TrendingUp,
-  Minus,
-  TrendingDown,
+  CheckSquare,
   Target,
-  Award,
+  BarChart3,
   AlertTriangle,
   ArrowRight,
-  Compass,
-  FileSearch,
-  Code2,
-  Video,
-  Briefcase,
-  Layers,
   Sparkles,
-  SlidersHorizontal,
   CheckCircle2,
-  Clock
+  Clock,
+  Lock,
+  RotateCw,
+  FileCode,
+  Video,
+  Star,
+  ChevronRight,
+  Layers,
+  Check,
+  Flame
 } from 'lucide-react';
 
 interface StudentDashboardProps {
   onNavigate: (tab: string) => void;
 }
 
+// Circular progress gauge with light track
+const CircularGauge: React.FC<{ percentage: number; colorClass: string; size?: number; strokeWidth?: number }> = ({
+  percentage,
+  colorClass,
+  size = 76,
+  strokeWidth = 7,
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+      <svg className="transform -rotate-90" width={size} height={size}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-slate-100"
+          fill="transparent"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className={`${colorClass} transition-all duration-1000 ease-out`}
+          fill="transparent"
+        />
+      </svg>
+      <span className="absolute text-base font-extrabold text-slate-900">{percentage}%</span>
+    </div>
+  );
+};
+
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onNavigate }) => {
-  const { studentProfile, industrySkills, isPrototypeData, demandLastUpdated, jobs } = useApp();
+  const { studentProfile } = useApp();
 
-  // Filters (Part 8)
-  const [selectedRole, setSelectedRole] = useState<string>(studentProfile.targetRole || 'Java Backend Developer');
-  const [selectedIndustry, setSelectedIndustry] = useState<string>('All Industries');
-  const [selectedExperience, setSelectedExperience] = useState<string>('0-2 Years (Freshers)');
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState<string>('Last 30 Days');
-  const [techFilter, setTechFilter] = useState<string>('All Technologies');
+  const firstName = studentProfile.fullName ? studentProfile.fullName.split(' ')[0] : 'Lakshman';
+  const readiness = studentProfile.overallReadiness || 72;
+  const skillMatch = 68;
+  const skillsIdentifiedCount = studentProfile.skills?.length || 12;
+  const skillsToDevelopCount = 4;
 
-  // Greeting based on time
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -43,380 +84,465 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onNavigate }
     return 'Good evening';
   };
 
-  // Filter skills based on selected filters
-  const currentRoleSkills = industrySkills.filter((skill) => {
-    const roleMatch = skill.role.toLowerCase() === selectedRole.toLowerCase();
-    const indMatch = selectedIndustry === 'All Industries' || skill.industry === selectedIndustry;
-    const catMatch = techFilter === 'All Technologies' || skill.category === techFilter;
-    return (roleMatch || selectedRole === 'Software Engineer (General)') && indMatch && catMatch;
-  });
+  const demandSkills = [
+    { name: 'Java', level: 94, status: 'High Demand', statusColor: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    { name: 'SQL', level: 90, status: 'High Demand', statusColor: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    { name: 'Spring Boot', level: 88, status: 'High Demand', statusColor: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    { name: 'REST APIs', level: 85, status: 'High Demand', statusColor: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+    { name: 'JPA / Hibernate', level: 72, status: 'Growing Demand', statusColor: 'text-blue-700 bg-blue-50 border-blue-200' },
+    { name: 'Git & GitHub', level: 82, status: 'High Demand', statusColor: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+  ];
 
-  // Calculate missing vs acquired
-  const studentSkillNames = studentProfile.skills.map((s) => s.name.toLowerCase());
-  const criticalSkills = currentRoleSkills.filter((s) => s.importance === 'Critical');
-  const criticalMissing = criticalSkills.filter(
-    (cs) => !studentSkillNames.includes(cs.name.toLowerCase())
-  );
+  const skillGaps = [
+    {
+      skill: 'Spring Boot',
+      current: 'Beginner',
+      currentLevel: 35,
+      required: 'Intermediate',
+      gap: 'High',
+      priority: 'High',
+    },
+    {
+      skill: 'REST APIs',
+      current: 'Beginner',
+      currentLevel: 40,
+      required: 'Intermediate',
+      gap: 'Medium',
+      priority: 'High',
+    },
+    {
+      skill: 'JPA / Hibernate',
+      current: 'Not Started',
+      currentLevel: 0,
+      required: 'Intermediate',
+      gap: 'High',
+      priority: 'Medium',
+    },
+  ];
+
+  const readinessMetrics = [
+    { label: 'Technical Skills', percentage: 76, color: 'bg-blue-600' },
+    { label: 'Projects', percentage: 65, color: 'bg-indigo-500' },
+    { label: 'Assessments', percentage: 70, color: 'bg-emerald-500' },
+    { label: 'Interview Readiness', percentage: 60, color: 'bg-amber-500' },
+  ];
+
+  const roadmapNodes = [
+    { title: 'Core Java', status: 'Completed', type: 'completed' },
+    { title: 'JDBC', status: 'Completed', type: 'completed' },
+    { title: 'JPA / Hibernate', status: 'In Progress', type: 'in-progress' },
+    { title: 'Spring Boot', status: 'Next', type: 'next' },
+    { title: 'REST APIs', status: 'Upcoming', type: 'upcoming' },
+    { title: 'Spring Security', status: 'Upcoming', type: 'upcoming' },
+  ];
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* HEADER BAR (PART 8) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 shadow-xl">
-        <div className="space-y-1.5">
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono text-teal-400 font-semibold uppercase tracking-wider">
-              {studentProfile.college}
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-xs text-slate-400 font-mono">
-              {studentProfile.degree} ({studentProfile.branch})
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            {getGreeting()}, {studentProfile.fullName.split(' ')[0]}
+    <div className="space-y-6 pb-12">
+      {/* ─── GREETING HEADER ───────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            {getGreeting()}, {firstName}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300">
-            Here is what the industry currently expects for your target career.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Here's your current skill-development overview and industry alignment.
           </p>
-        </div>
-
-        {/* Readiness and Target Role Cards */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
-              <Target className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[10px] text-slate-400 uppercase font-mono font-medium">Target Role</p>
-              <p className="text-xs font-bold text-white">{studentProfile.targetRole}</p>
-            </div>
-          </div>
-
-          <div className="px-4 py-3 rounded-2xl bg-teal-950/40 border border-teal-500/30 flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center text-teal-300">
-              <Award className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[10px] text-teal-300 uppercase font-mono font-medium">Career Readiness</p>
-              <div className="flex items-baseline space-x-1.5">
-                <span className="text-lg font-black text-teal-300">{studentProfile.overallReadiness}%</span>
-                <span className="text-[10px] text-slate-400">Target 75%+</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* QUICK PIPELINE SHORTCUTS */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <button
-          onClick={() => onNavigate('gap-analyzer')}
-          className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-teal-500/40 hover:bg-slate-900 transition-all text-left group"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <FileSearch className="w-5 h-5 text-teal-400 group-hover:scale-110 transition-transform" />
-            <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-teal-400 transition-colors" />
+      {/* ─── ROW 1: 5 SUMMARY METRICS CARDS ───────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+        {/* Card 1: Target Role */}
+        <div className="lg:col-span-4 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex items-center space-x-4">
+          <div className="w-13 h-13 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm">
+            <Briefcase className="w-6 h-6" />
           </div>
-          <p className="text-xs font-bold text-white">AI Skill Gap</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">
-            {criticalMissing.length > 0 ? `${criticalMissing.length} Critical Gaps` : 'Profile Aligned'}
-          </p>
-        </button>
-
-        <button
-          onClick={() => onNavigate('roadmap')}
-          className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-teal-500/40 hover:bg-slate-900 transition-all text-left group"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <Layers className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-            <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 transition-colors" />
-          </div>
-          <p className="text-xs font-bold text-white">Growth Roadmap</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">8 Structured Steps</p>
-        </button>
-
-        <button
-          onClick={() => onNavigate('practice-lab')}
-          className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-teal-500/40 hover:bg-slate-900 transition-all text-left group"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <Code2 className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
-            <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-amber-400 transition-colors" />
-          </div>
-          <p className="text-xs font-bold text-white">Practice Lab</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">REST API Assignment</p>
-        </button>
-
-        <button
-          onClick={() => onNavigate('mock-interview')}
-          className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-teal-500/40 hover:bg-slate-900 transition-all text-left group"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <Video className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-            <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition-colors" />
-          </div>
-          <p className="text-xs font-bold text-white">AI Mock Interview</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Camera & Integrity AI</p>
-        </button>
-      </div>
-
-      {/* PRIMARY SECTION: CURRENT INDUSTRY DEMAND (PART 8 & 9) */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-bold text-white tracking-tight flex items-center space-x-2">
-                <Compass className="w-5 h-5 text-teal-400" />
-                <span>CURRENT INDUSTRY DEMAND</span>
-              </h2>
-              {isPrototypeData && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  Prototype / Sample Industry Data
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-400 flex items-center space-x-2">
-              <Clock className="w-3.5 h-3.5 text-slate-500" />
-              <span>Demand data updated on: <strong className="text-slate-300">{demandLastUpdated}</strong></span>
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Target Role</p>
+            <h3 className="text-base sm:text-lg font-extrabold text-slate-900 truncate mt-0.5">
+              {studentProfile.targetRole || 'Java Backend Developer'}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-snug">
+              Your current learning path is aligned with this role.
             </p>
+          </div>
+        </div>
+
+        {/* Card 2: Career Readiness */}
+        <div className="lg:col-span-2 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="flex items-center space-x-1.5 text-slate-600 mb-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-[11px] font-bold">Career Readiness</span>
+          </div>
+          <CircularGauge percentage={readiness} colorClass="text-emerald-500" size={68} strokeWidth={6} />
+        </div>
+
+        {/* Card 3: Industry Skill Match */}
+        <div className="lg:col-span-2 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="flex items-center space-x-1.5 text-slate-600 mb-2">
+            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+            <span className="text-[11px] font-bold">Industry Match</span>
+          </div>
+          <CircularGauge percentage={skillMatch} colorClass="text-blue-600" size={68} strokeWidth={6} />
+        </div>
+
+        {/* Card 4: Skills Identified */}
+        <div className="lg:col-span-2 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="flex items-center space-x-1.5 text-slate-600 mb-2">
+            <CheckSquare className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="text-[11px] font-bold">Skills Identified</span>
+          </div>
+          <div className="flex items-center space-x-2 my-auto">
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <span className="text-2xl font-black text-slate-900">{skillsIdentifiedCount}</span>
+          </div>
+        </div>
+
+        {/* Card 5: Skills to Develop */}
+        <div className="lg:col-span-2 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col items-center justify-center text-center">
+          <div className="flex items-center space-x-1.5 text-slate-600 mb-2">
+            <Target className="w-3.5 h-3.5 text-amber-600" />
+            <span className="text-[11px] font-bold">To Develop</span>
+          </div>
+          <div className="flex items-center space-x-2 my-auto">
+            <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
+              <Flame className="w-4 h-4" />
+            </div>
+            <span className="text-2xl font-black text-slate-900">{skillsToDevelopCount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── ROW 2: INDUSTRY DEMAND | SKILL GAPS | RECOMMENDED NEXT STEP ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Industry Demand */}
+        <div className="lg:col-span-4 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4 text-blue-600" />
+                <h3 className="text-sm font-bold text-slate-900">Industry Demand</h3>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                Demonstration Data
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Skills currently relevant to your target role</p>
+
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
+              <span>Skill</span>
+              <span>Demand Level</span>
+            </div>
+
+            <div className="space-y-3 mt-3">
+              {demandSkills.map((item) => (
+                <div key={item.name} className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-800 w-28 truncate">{item.name}</span>
+                  <div className="flex-1 mx-3">
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          item.status === 'Growing Demand' ? 'bg-blue-600' : 'bg-emerald-500'
+                        }`}
+                        style={{ width: `${item.level}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${item.statusColor}`}>
+                    {item.status}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <button
-            onClick={() => onNavigate('gap-analyzer')}
-            className="self-start sm:self-auto flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-300 hover:bg-teal-500 hover:text-slate-950 text-xs font-semibold transition-all"
+            onClick={() => onNavigate('skill-gap-page')}
+            className="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center justify-center space-x-1.5 transition-colors"
           >
-            <span>Compare My Profile</span>
+            <span>Explore All Industry Skills</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* MULTI-CRITERIA FILTERS BAR (PART 8) */}
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
-          {/* Role Filter */}
+        {/* Current Skill Gaps */}
+        <div className="lg:col-span-5 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
           <div>
-            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">
-              Job Role
-            </label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:border-teal-500 focus:outline-none"
-            >
-              {SUPPORTED_ROLES.map((r) => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-          </div>
+            <div className="flex items-center space-x-2 mb-1">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <h3 className="text-sm font-bold text-slate-900">Current Skill Gaps</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Immediate gaps needing progression to meet industry benchmark</p>
 
-          {/* Industry Filter */}
-          <div>
-            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">
-              Industry
-            </label>
-            <select
-              value={selectedIndustry}
-              onChange={(e) => setSelectedIndustry(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:border-teal-500 focus:outline-none"
-            >
-              <option value="All Industries">All Industries</option>
-              {INDUSTRIES.map((ind) => (
-                <option key={ind} value={ind}>{ind}</option>
-              ))}
-            </select>
-          </div>
+            <div className="grid grid-cols-12 gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
+              <span className="col-span-4">Skill</span>
+              <span className="col-span-3">Current</span>
+              <span className="col-span-3">Required</span>
+              <span className="col-span-1 text-center">Gap</span>
+              <span className="col-span-1 text-right">Priority</span>
+            </div>
 
-          {/* Technology Category */}
-          <div>
-            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">
-              Technology Stack
-            </label>
-            <select
-              value={techFilter}
-              onChange={(e) => setTechFilter(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:border-teal-500 focus:outline-none"
-            >
-              <option value="All Technologies">All Technologies</option>
-              <option value="Language">Languages</option>
-              <option value="Backend">Backend & Frameworks</option>
-              <option value="Frontend">Frontend</option>
-              <option value="Database">Databases</option>
-              <option value="Cloud/DevOps">Cloud & DevOps</option>
-              <option value="Security">Security</option>
-              <option value="Core CS">Core CS</option>
-            </select>
-          </div>
-
-          {/* Experience Level */}
-          <div>
-            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">
-              Experience Level
-            </label>
-            <select
-              value={selectedExperience}
-              onChange={(e) => setSelectedExperience(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:border-teal-500 focus:outline-none"
-            >
-              <option value="0-2 Years (Freshers)">0-2 Years (Freshers)</option>
-              <option value="2-4 Years (Mid Level)">2-4 Years (Mid Level)</option>
-              <option value="Internship Only">Internship Only</option>
-            </select>
-          </div>
-
-          {/* Time Period */}
-          <div>
-            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">
-              Time Period
-            </label>
-            <select
-              value={selectedTimePeriod}
-              onChange={(e) => setSelectedTimePeriod(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:border-teal-500 focus:outline-none"
-            >
-              <option value="Last 30 Days">Last 30 Days</option>
-              <option value="Last 90 Days">Last 90 Days</option>
-              <option value="Current Academic Year 2026">Current Year 2026</option>
-            </select>
-          </div>
-        </div>
-
-        {/* TOP SKILLS IN DEMAND TABLE / CARDS (PART 8 SPEC) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {currentRoleSkills.map((skill) => {
-            const hasSkill = studentSkillNames.includes(skill.name.toLowerCase());
-            const studentVersion = studentProfile.skills.find(
-              (s) => s.name.toLowerCase() === skill.name.toLowerCase()
-            );
-
-            return (
-              <div
-                key={skill.id}
-                className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-                        {skill.category}
-                      </span>
-                      <h3 className="text-base font-bold text-white mt-1.5">{skill.name}</h3>
-                    </div>
-
-                    {/* Trend Indicator */}
-                    <span
-                      className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-semibold ${
-                        skill.trend === 'Growing'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : skill.trend === 'Declining'
-                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700'
-                      }`}
-                    >
-                      {skill.trend === 'Growing' && <TrendingUp className="w-3 h-3" />}
-                      {skill.trend === 'Declining' && <TrendingDown className="w-3 h-3" />}
-                      {skill.trend === 'Stable' && <Minus className="w-3 h-3" />}
-                      <span>{skill.trend}</span>
-                    </span>
-                  </div>
-
-                  {/* Percentage Progress Bar */}
-                  <div className="space-y-1.5 my-3">
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-slate-400">Demand Frequency</span>
-                      <span className="text-teal-300 font-bold">{skill.demandScore}%</span>
-                    </div>
-                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div className="space-y-4 mt-3">
+              {skillGaps.map((item) => (
+                <div key={item.skill} className="grid grid-cols-12 gap-2 items-center text-xs">
+                  <div className="col-span-4 font-bold text-slate-900 truncate">{item.skill}</div>
+                  <div className="col-span-3">
+                    <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden mb-1">
                       <div
-                        className="bg-gradient-to-r from-teal-500 to-emerald-400 h-2 rounded-full"
-                        style={{ width: `${skill.demandScore}%` }}
+                        className="bg-emerald-500 h-full rounded-full"
+                        style={{ width: `${item.currentLevel}%` }}
                       />
                     </div>
+                    <span className="text-[10px] text-slate-500">{item.current}</span>
                   </div>
-
-                  <p className="text-xs text-slate-400 leading-relaxed mb-3">
-                    {skill.whyItMatters}
-                  </p>
-                </div>
-
-                {/* Student Match Status Footer */}
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-1.5">
-                    {hasSkill ? (
-                      <span className="inline-flex items-center space-x-1 text-teal-400 text-[11px] font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>You have: {studentVersion?.level}</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center space-x-1 text-rose-400 text-[11px] font-medium">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        <span>Missing in your profile</span>
-                      </span>
-                    )}
+                  <div className="col-span-3 text-[11px] text-slate-600 font-medium">{item.required}</div>
+                  <div className="col-span-1 flex justify-center">
+                    <span
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        item.gap === 'High'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}
+                    >
+                      {item.gap}
+                    </span>
                   </div>
-
-                  <button
-                    onClick={() => onNavigate('gap-analyzer')}
-                    className="text-[11px] text-slate-400 hover:text-teal-300 transition-colors underline"
-                  >
-                    Analyze Gap
-                  </button>
+                  <div className="col-span-1 flex justify-end">
+                    <span
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        item.priority === 'High'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}
+                    >
+                      {item.priority}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ACTIVE HIRING REQUISITION RADAR PREVIEW */}
-      <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-white flex items-center space-x-2">
-              <Briefcase className="w-4 h-4 text-teal-400" />
-              <span>Target Role Benchmark Opportunities</span>
-            </h3>
-            <p className="text-xs text-slate-400">
-              Live corporate openings filtering for your target career: {studentProfile.targetRole}
-            </p>
+              ))}
+            </div>
           </div>
+
           <button
-            onClick={() => onNavigate('opportunities')}
-            className="text-xs text-teal-400 hover:text-teal-300 font-semibold"
+            onClick={() => onNavigate('roadmap')}
+            className="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center justify-center space-x-1.5 transition-colors"
           >
-            View All ({jobs.length})
+            <span>View Personalized Skill Roadmap</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {jobs.slice(0, 3).map((job) => (
-            <div
-              key={job.id}
-              className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex flex-col justify-between"
-            >
+        {/* Recommended Next Step */}
+        <div className="lg:col-span-3 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center space-x-2 mb-3">
+              <Target className="w-4 h-4 text-blue-600" />
+              <h3 className="text-sm font-bold text-slate-900">Recommended Next Step</h3>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start space-x-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
+                <FileCode className="w-4 h-4" />
+              </div>
               <div>
-                <div className="flex items-start justify-between mb-2">
-                  <span className="text-xs font-bold text-white">{job.companyName}</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20">
-                    Min {job.minReadinessScore}%
-                  </span>
-                </div>
-                <h4 className="text-sm font-semibold text-slate-200 mb-1">{job.title}</h4>
-                <p className="text-xs text-teal-400 font-mono mb-2">{job.package}</p>
-                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                  {job.description}
+                <h4 className="text-xs font-extrabold text-slate-900 leading-snug">
+                  Complete your Spring Boot assessment
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                  Improve your Spring Boot proficiency and update your verified skill profile.
                 </p>
               </div>
-
-              <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-slate-500">{job.location}</span>
-                <button
-                  onClick={() => onNavigate('opportunities')}
-                  className="text-teal-400 hover:text-teal-300 font-medium"
-                >
-                  Check Match →
-                </button>
-              </div>
             </div>
-          ))}
+          </div>
+
+          <button
+            onClick={() => onNavigate('practice-lab')}
+            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center space-x-1.5"
+          >
+            <span>Continue</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* ─── ROW 3: SKILL DEVELOPMENT ROADMAP & CAREER READINESS ───────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Roadmap */}
+        <div className="lg:col-span-8 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Layers className="w-4 h-4 text-blue-600" />
+              <h3 className="text-sm font-bold text-slate-900">Skill Development Roadmap</h3>
+            </div>
+            <button
+              onClick={() => onNavigate('roadmap')}
+              className="text-xs text-blue-600 hover:text-blue-700 font-semibold flex items-center space-x-1"
+            >
+              <span>View Full Path</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between overflow-x-auto pb-2 scrollbar-none pt-2">
+            {roadmapNodes.map((node, index) => (
+              <React.Fragment key={node.title}>
+                <div className="flex flex-col items-center text-center shrink-0 min-w-[84px]">
+                  {node.type === 'completed' && (
+                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold mb-2 shadow-sm">
+                      <Check className="w-4 h-4 text-white stroke-[3]" />
+                    </div>
+                  )}
+                  {node.type === 'in-progress' && (
+                    <div className="w-8 h-8 rounded-full border-2 border-blue-600 bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
+                      <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                    </div>
+                  )}
+                  {node.type === 'next' && (
+                    <div className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50 text-blue-600 flex items-center justify-center mb-2 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                  )}
+                  {node.type === 'upcoming' && (
+                    <div className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50 text-slate-400 flex items-center justify-center mb-2">
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+                  )}
+
+                  <p className="text-xs font-bold text-slate-800 truncate max-w-[85px]">{node.title}</p>
+                  <span
+                    className={`text-[9px] font-semibold mt-1 px-1.5 py-0.5 rounded-full border ${
+                      node.type === 'completed'
+                        ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                        : node.type === 'in-progress'
+                        ? 'text-blue-700 bg-blue-50 border-blue-200'
+                        : node.type === 'next'
+                        ? 'text-slate-700 bg-slate-100 border-slate-200'
+                        : 'text-slate-500 bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    {node.status}
+                  </span>
+                </div>
+
+                {index < roadmapNodes.length - 1 && (
+                  <div className="w-8 h-0.5 bg-slate-200 shrink-0 mx-1 flex items-center justify-center">
+                    <span className="text-slate-400 text-[10px]">→</span>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Career Readiness Details */}
+        <div className="lg:col-span-4 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="flex items-center space-x-2 mb-4">
+            <Star className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-bold text-slate-900">Career Readiness</h3>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <CircularGauge percentage={readiness} colorClass="text-emerald-500" size={82} strokeWidth={8} />
+
+            <div className="flex-1 space-y-2">
+              {readinessMetrics.map((m) => (
+                <div key={m.label} className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-semibold">
+                    <span className="text-slate-600">{m.label}</span>
+                    <span className="text-slate-900 font-bold">{m.percentage}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className={`${m.color} h-full rounded-full`} style={{ width: `${m.percentage}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── ROW 4: PENDING ASSIGNMENT | AI VIDEO INTERVIEW | RECENT FEEDBACK ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Card 1 */}
+        <div
+          onClick={() => onNavigate('practice-lab')}
+          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-slate-300 transition-all cursor-pointer flex items-center justify-between group"
+        >
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+              <FileCode className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Assignment</p>
+              <div className="flex items-center space-x-2 mt-0.5">
+                <h4 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  Spring Boot REST API Project
+                </h4>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  Project
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 flex items-center space-x-1">
+                <Clock className="w-3 h-3 text-slate-400" />
+                <span>Due: 3 days</span>
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-800 transition-colors" />
+        </div>
+
+        {/* Card 2 */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex items-center justify-between">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Video className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Video Interview</p>
+              <h4 className="text-xs font-bold text-slate-900 mt-0.5">
+                Java Backend Developer Mock Interview
+              </h4>
+              <p className="text-[10px] text-slate-500 mt-1 flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                <span>Status: Not Started</span>
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigate('mock-interview')}
+            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm shrink-0 ml-2"
+          >
+            Start Interview →
+          </button>
+        </div>
+
+        {/* Card 3 */}
+        <div
+          onClick={() => onNavigate('feedback')}
+          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-slate-300 transition-all cursor-pointer flex items-center justify-between group"
+        >
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Star className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recent Feedback</p>
+              <div className="flex items-center space-x-2 mt-0.5">
+                <h4 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  Spring Boot Assessment
+                </h4>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Score: 74%
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 truncate max-w-[180px]">
+                Good progress. Improve REST API concepts.
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-800 transition-colors" />
         </div>
       </div>
     </div>

@@ -1,0 +1,14 @@
+LAKSHMAN REDDY
+Java Backend Developer
+Email: lakshman@example.com
+Education: B.Tech in Computer Science, 2024
+
+Technical Skills:
+Java, Spring Boot, Microservices, REST APIs, SQL, MySQL, PostgreSQL, Hibernate, JPA, Docker, Git, Linux, JUnit, Mockito
+
+Experience & Projects:
+E-Commerce Microservices Platform:
+Developed robust REST APIs using Spring Boot and Java 17. Implemented SQL database persistence with Hibernate JPA and PostgreSQL. Containerized services using Docker and orchestrated CI/CD pipelines.
+
+Banking Transaction Processing System:
+Architected asynchronous transaction processing using Spring Boot and MySQL with ACID transaction guarantees. Wrote unit tests using JUnit and Mockito.

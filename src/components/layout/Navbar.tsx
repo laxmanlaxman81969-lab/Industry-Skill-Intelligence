@@ -1,16 +1,19 @@
-import React from 'react';
-import { useApp } from '../../context/AppContext';
+import React from "react";
+import { useApp } from "../../context/AppContext";
 import {
-  Radar,
   Sparkles,
   LogOut,
   User,
   Building2,
   GraduationCap,
   ShieldCheck,
-  ChevronDown
-} from 'lucide-react';
-import { UserRole } from '../../types';
+  ChevronDown,
+  Home,
+  Layers,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { UserRole } from "../../types";
 
 interface NavbarProps {
   onOpenAuth: (role?: UserRole) => void;
@@ -21,178 +24,143 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   activeView,
-  setActiveView
+  setActiveView,
 }) => {
   const { currentUser, logout, login } = useApp();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
           <div
             className="flex items-center space-x-3 cursor-pointer group"
-            onClick={() => setActiveView('landing')}
+            onClick={() => {
+              setActiveView("landing");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
           >
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-500/5 border border-teal-500/30 text-teal-400 group-hover:border-teal-400/60 transition-all shadow-lg shadow-teal-950/30">
-              <Radar className="w-5 h-5 animate-pulse-subtle" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping opacity-75" />
+            <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 group-hover:border-blue-400 transition-all shadow-xs">
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-teal-300 transition-colors">
-                  AI Industry Skill Gap & Curriculum Platform
+                <span className="text-sm sm:text-base font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                  AI Skill Gap Platform
                 </span>
-                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20 font-mono">
-                  Enterprise Platform
+                <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                  Enterprise
                 </span>
               </div>
-              <p className="hidden sm:block text-[11px] text-slate-400 font-medium">
-                From Campus Skills to Industry Opportunities
+              <p className="hidden md:block text-[11px] text-slate-500 font-medium">
+                Curriculum Alignment & Skill Intelligence
               </p>
             </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 text-sm font-medium text-slate-300">
+          <nav className="hidden lg:flex items-center space-x-1 text-xs font-medium text-slate-600">
             <button
-              onClick={() => setActiveView('landing')}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                activeView === 'landing'
-                  ? 'text-teal-400 bg-teal-500/10'
-                  : 'hover:text-white hover:bg-slate-800/60'
+              onClick={() => {
+                setActiveView("landing");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 ${
+                activeView === "landing"
+                  ? "text-blue-700 bg-blue-50 border border-blue-200 font-semibold"
+                  : "hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
-              Home
+              <Home className="w-3.5 h-3.5 opacity-70" />
+              <span>Home</span>
             </button>
             <button
               onClick={() => {
-                setActiveView('landing');
+                setActiveView("landing");
                 setTimeout(() => {
-                  document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                  document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
+                }, 80);
               }}
-              className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center space-x-1.5"
             >
-              How It Works
+              <Layers className="w-3.5 h-3.5 opacity-70" />
+              <span>How It Works</span>
             </button>
             <button
               onClick={() => {
-                setActiveView('landing');
+                setActiveView("landing");
                 setTimeout(() => {
-                  document.getElementById('industry-skills')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                  document.getElementById("industry-skills")?.scrollIntoView({ behavior: "smooth" });
+                }, 80);
               }}
-              className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center space-x-1.5"
             >
-              Industry Skills
+              <TrendingUp className="w-3.5 h-3.5 opacity-70" />
+              <span>Industry Skills</span>
             </button>
             <button
               onClick={() => {
-                setActiveView('landing');
+                setActiveView("landing");
                 setTimeout(() => {
-                  document.getElementById('stakeholders')?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                  document.getElementById("stakeholders")?.scrollIntoView({ behavior: "smooth" });
+                }, 80);
               }}
-              className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center space-x-1.5"
             >
-              Ecosystem
+              <Users className="w-3.5 h-3.5 opacity-70" />
+              <span>Ecosystem</span>
             </button>
 
-            {/* Quick Portal Switcher for Testing/Review */}
-            <div className="relative group ml-2">
-              <button className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:border-teal-500/50 hover:text-teal-300 transition-all">
-                <span>Switch Portal</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
-              </button>
-              <div className="absolute right-0 mt-1 w-48 py-2 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                <button
-                  onClick={() => {
-                    login('student');
-                    setActiveView('student-dashboard');
-                  }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-left hover:bg-teal-500/10 hover:text-teal-300 text-slate-300"
-                >
-                  <User className="w-3.5 h-3.5 text-teal-400" />
-                  <span>Student Portal</span>
-                </button>
-                <button
-                  onClick={() => {
-                    login('company');
-                    setActiveView('company-portal');
-                  }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-left hover:bg-indigo-500/10 hover:text-indigo-300 text-slate-300"
-                >
-                  <Building2 className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Company Portal</span>
-                </button>
-                <button
-                  onClick={() => {
-                    login('college');
-                    setActiveView('college-portal');
-                  }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-left hover:bg-amber-500/10 hover:text-amber-300 text-slate-300"
-                >
-                  <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>College Portal</span>
-                </button>
-                <button
-                  onClick={() => {
-                    login('admin');
-                    setActiveView('admin-portal');
-                  }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-left hover:bg-rose-500/10 hover:text-rose-300 text-slate-300"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Admin Portal</span>
-                </button>
-              </div>
-            </div>
           </nav>
 
           {/* Right Action: Auth & Profile */}
           <div className="flex items-center space-x-3">
-            {currentUser ? (
-              <div className="flex items-center space-x-3">
-                <div className="hidden sm:flex flex-col text-right">
-                  <span className="text-xs font-semibold text-white">{currentUser.name}</span>
-                  <span className="text-[10px] text-teal-400 font-mono uppercase tracking-wider">
-                    {currentUser.role} Portal
-                  </span>
+            {currentUser && activeView !== "landing" ? (
+              <div className="flex items-center space-x-2.5">
+                {/* User Avatar & Name */}
+                <div className="flex items-center space-x-2 pl-2 border-l border-slate-200">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                    {(() => {
+                      const name = currentUser.name === "Aarav Sharma" ? "N.Lakshman" : currentUser.name;
+                      const parts = name.split(/[\s.]+/).filter(Boolean);
+                      return parts.length >= 2
+                        ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+                        : name.slice(0, 2).toUpperCase();
+                    })()}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left">
+                    <span className="text-xs font-semibold text-slate-900 leading-tight">
+                      {currentUser.name === "Aarav Sharma" ? "N.Lakshman" : currentUser.name}
+                    </span>
+                    <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+                      {currentUser.role}
+                    </span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    if (currentUser.role === 'student') setActiveView('student-dashboard');
-                    if (currentUser.role === 'company') setActiveView('company-portal');
-                    if (currentUser.role === 'college') setActiveView('college-portal');
-                    if (currentUser.role === 'admin') setActiveView('admin-portal');
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors"
-                >
-                  Dashboard
-                </button>
+
                 <button
                   onClick={() => {
                     logout();
-                    setActiveView('landing');
+                    setActiveView("landing");
                   }}
                   title="Sign Out"
-                  className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-400 hover:border-rose-900/50 transition-colors"
+                  className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => onOpenAuth()}
-                  className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors"
                 >
                   Login
                 </button>
                 <button
-                  onClick={() => onOpenAuth('student')}
-                  className="flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 hover:from-teal-400 hover:to-emerald-400 shadow-md shadow-teal-500/20 hover:shadow-teal-500/40 transition-all font-sans"
+                  onClick={() => onOpenAuth("student")}
+                  className="flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-xs transition-all font-sans"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Get Started</span>

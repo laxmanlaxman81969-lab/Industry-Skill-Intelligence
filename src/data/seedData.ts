@@ -41,8 +41,8 @@ export const INDUSTRIES = [
 export const INITIAL_USERS: User[] = [
   {
     id: 'usr-student-1',
-    name: 'Aarav Sharma',
-    email: 'student@radar.edu',
+    name: 'N.Lakshman',
+    email: 'lakshman@skillplatform.edu',
     role: 'student',
     createdAt: '2026-08-10'
   },
@@ -63,7 +63,7 @@ export const INITIAL_USERS: User[] = [
   {
     id: 'usr-admin-1',
     name: 'System Administrator',
-    email: 'admin@radar.gov.in',
+    email: 'admin@skillplatform.gov.in',
     role: 'admin',
     createdAt: '2026-01-01'
   }
@@ -72,8 +72,8 @@ export const INITIAL_USERS: User[] = [
 export const INITIAL_STUDENT_PROFILE: StudentProfile = {
   id: 'std-001',
   userId: 'usr-student-1',
-  fullName: 'Aarav Sharma',
-  email: 'student@radar.edu',
+  fullName: 'N.Lakshman',
+  email: 'lakshman@skillplatform.edu',
   college: 'Apex Institute of Technology',
   degree: 'B.Tech',
   branch: 'Computer Science & Engineering',
@@ -82,7 +82,7 @@ export const INITIAL_STUDENT_PROFILE: StudentProfile = {
   targetRole: 'Java Backend Developer',
   targetCompany: 'ABC Technologies',
   hasResume: true,
-  resumeFileName: 'Aarav_Sharma_Backend_Resume.pdf',
+  resumeFileName: 'Lakshman_Resume.pdf',
   resumeScore: 78,
   resumeBreakdown: {
     skillsRelevance: 82,
@@ -471,6 +471,19 @@ export const INITIAL_JOB_REQUIREMENTS: JobRequirement[] = [
       { skill: 'JPA/Hibernate', level: 'Intermediate', weight: 7 },
       { skill: 'Git', level: 'Intermediate', weight: 6 }
     ],
+    preferredSkills: [
+      { skill: 'Docker', level: 'Intermediate', weight: 7 },
+      { skill: 'Microservices', level: 'Intermediate', weight: 8 },
+      { skill: 'Redis', level: 'Intermediate', weight: 6 },
+      { skill: 'AWS', level: 'Intermediate', weight: 6 }
+    ],
+    responsibilities: [
+      'Build high-concurrency Spring Boot REST services',
+      'Optimize relational queries and data access layers',
+      'Integrate with message brokers and cloud services'
+    ],
+    educationRequirements: 'B.Tech / B.E. in Computer Science, IT, or related technical field',
+    otherRequirements: ['Good communication skills', 'Knowledge of agile methodologies'],
     minReadinessScore: 65,
     postedDate: '2026-09-05',
     applicantsCount: 42
@@ -493,6 +506,19 @@ export const INITIAL_JOB_REQUIREMENTS: JobRequirement[] = [
       { skill: 'SQL', level: 'Intermediate', weight: 7 },
       { skill: 'REST API', level: 'Intermediate', weight: 8 }
     ],
+    preferredSkills: [
+      { skill: 'TypeScript', level: 'Intermediate', weight: 8 },
+      { skill: 'Node.js', level: 'Intermediate', weight: 7 },
+      { skill: 'Tailwind CSS', level: 'Intermediate', weight: 6 },
+      { skill: 'Docker', level: 'Beginner', weight: 5 }
+    ],
+    responsibilities: [
+      'Develop responsive client interfaces in React',
+      'Implement robust transactional backend endpoints with Node or Java',
+      'Write unit and integration tests'
+    ],
+    educationRequirements: 'B.Tech / MCA / B.Sc in Computer Science or equivalent',
+    otherRequirements: ['Problem solving skills', 'Clean coding habits'],
     minReadinessScore: 70,
     postedDate: '2026-09-08',
     applicantsCount: 68
@@ -514,6 +540,19 @@ export const INITIAL_JOB_REQUIREMENTS: JobRequirement[] = [
       { skill: 'Git', level: 'Intermediate', weight: 8 },
       { skill: 'Linux', level: 'Intermediate', weight: 8 }
     ],
+    preferredSkills: [
+      { skill: 'Kubernetes', level: 'Intermediate', weight: 8 },
+      { skill: 'Terraform', level: 'Beginner', weight: 7 },
+      { skill: 'CI/CD', level: 'Intermediate', weight: 8 },
+      { skill: 'Python', level: 'Intermediate', weight: 6 }
+    ],
+    responsibilities: [
+      'Automate CI/CD pipelines',
+      'Package applications into Docker containers',
+      'Assist in monitoring cloud infrastructure and Kubernetes clusters'
+    ],
+    educationRequirements: 'B.Tech / B.E. / BCA / MCA or related field',
+    otherRequirements: ['Strong Linux command-line skills', 'Basic networking understanding'],
     minReadinessScore: 60,
     postedDate: '2026-09-10',
     applicantsCount: 29

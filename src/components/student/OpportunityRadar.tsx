@@ -12,17 +12,40 @@ import {
   Sparkles,
   ArrowRight,
   Send,
-  Filter
+  Filter,
+  TrendingUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export const OpportunityRadar: React.FC = () => {
-  const { jobs, studentProfile } = useApp();
+interface OpportunityRadarProps {
+  onNavigate?: (view: string) => void;
+}
+
+export const OpportunityRadar: React.FC<OpportunityRadarProps> = ({ onNavigate }) => {
+  const { jobs, studentProfile, setSelectedOpportunityContext, resumeLibrary, latestAnalysis } = useApp();
   const [filterType, setFilterType] = useState<string>('All');
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  const studentSkillNames = studentProfile.skills.map((s) => s.name.toLowerCase());
+  const studentSkillNames = studentProfile?.skills?.map((s) => s.name.toLowerCase()) || [];
+
+  const getExistingAnalysisId = (jobId: string, jobTitle: string) => {
+    for (const r of (resumeLibrary || [])) {
+      const found = r.analysesHistory?.find(
+        (h) => h.opportunityId === jobId || h.opportunityTitle?.toLowerCase() === jobTitle.toLowerCase()
+      );
+      if (found) return found.id;
+    }
+    if (
+      latestAnalysis &&
+      (latestAnalysis.opportunityId === jobId ||
+        latestAnalysis.opportunityTitle?.toLowerCase() === jobTitle.toLowerCase() ||
+        latestAnalysis.roleName?.toLowerCase() === jobTitle.toLowerCase())
+    ) {
+      return latestAnalysis.analysisId;
+    }
+    return null;
+  };
 
   const filteredJobs = jobs.filter((job) => {
     if (filterType === 'All') return true;
@@ -40,36 +63,46 @@ export const OpportunityRadar: React.FC = () => {
     } catch (e) {}
   };
 
+  const handleAnalyzeOpportunity = (job: JobRequirement) => {
+    setSelectedOpportunityContext(job);
+    if (onNavigate) {
+      onNavigate('gap-analyzer');
+      return;
+    }
+    window.history.pushState({ view: 'gap-analyzer' }, '', '/');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 pb-12 max-w-5xl">
       {/* HEADER BAR */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-teal-400 font-semibold">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
               Career Readiness Matching
             </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-xs text-slate-400">Opportunity Recommendations</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-xs text-slate-500">Opportunity Recommendations</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Opportunity Radar
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Industry Opportunity Matches
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300">
+          <p className="text-xs sm:text-sm text-slate-500">
             Hiring opportunities matched to your verified skills and measured career readiness score ({studentProfile.overallReadiness}%).
           </p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap gap-2 self-start md:self-auto">
+        <div className="flex flex-wrap gap-2 self-start md:self-auto bg-slate-100 p-1 rounded-xl border border-slate-200/80">
           {['All', 'Qualified Only', 'Full-time', 'Internship to Full-time'].map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 filterType === type
-                  ? 'bg-teal-500 text-slate-950 shadow-md shadow-teal-500/20'
-                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-white text-blue-700 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {type}
@@ -80,8 +113,8 @@ export const OpportunityRadar: React.FC = () => {
 
       {/* Success Toast */}
       {successToast && (
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center space-x-2 animate-fade-in shadow-xl">
-          <CheckCircle2 className="w-5 h-5 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center space-x-2 animate-fade-in shadow-xs">
+          <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
           <span>{successToast}</span>
         </div>
       )}
@@ -92,47 +125,39 @@ export const OpportunityRadar: React.FC = () => {
           const isQualified = studentProfile.overallReadiness >= job.minReadinessScore;
           const isApplied = appliedJobs.includes(job.id);
 
-          // Calculate how many required skills the student possesses
-          const matchedSkills = job.requiredSkills.filter((rs) =>
-            studentSkillNames.includes(rs.skill.toLowerCase())
-          );
-          const missingSkills = job.requiredSkills.filter(
-            (rs) => !studentSkillNames.includes(rs.skill.toLowerCase())
-          );
-
           return (
             <div
               key={job.id}
-              className={`p-6 rounded-3xl border transition-all ${
+              className={`p-6 rounded-2xl border transition-all ${
                 isQualified
-                  ? 'bg-slate-900/80 border-slate-800 hover:border-teal-500/50'
-                  : 'bg-slate-950/60 border-slate-900 opacity-90'
+                  ? 'bg-white border-slate-200/90 shadow-sm hover:border-blue-300'
+                  : 'bg-slate-50/80 border-slate-200/80 opacity-90'
               }`}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-bold text-white flex items-center space-x-1.5">
-                      <Building2 className="w-4 h-4 text-indigo-400" />
+                    <span className="text-sm font-bold text-slate-900 flex items-center space-x-1.5">
+                      <Building2 className="w-4 h-4 text-blue-600" />
                       <span>{job.companyName}</span>
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                       {job.type}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 font-bold">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                       {job.package}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-extrabold text-slate-100">{job.title}</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">{job.title}</h3>
 
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <span className="flex items-center space-x-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
                       <span>{job.location}</span>
                     </span>
                     <span className="flex items-center space-x-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-500" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
                       <span>{job.experience}</span>
                     </span>
                   </div>
@@ -141,17 +166,17 @@ export const OpportunityRadar: React.FC = () => {
                 {/* Readiness Benchmark Gauge */}
                 <div className="flex flex-col items-start md:items-end space-y-1">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs text-slate-400 font-mono">Min Readiness:</span>
-                    <span className="text-sm font-bold text-white">{job.minReadinessScore}%</span>
+                    <span className="text-xs text-slate-500">Min Readiness:</span>
+                    <span className="text-sm font-bold text-slate-900">{job.minReadinessScore}%</span>
                   </div>
                   <div>
                     {isQualified ? (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Ready & Qualified ({studentProfile.overallReadiness}%)</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                         <AlertTriangle className="w-3.5 h-3.5" />
                         <span>Readiness Gap (Need {job.minReadinessScore - studentProfile.overallReadiness}% more)</span>
                       </span>
@@ -160,13 +185,13 @@ export const OpportunityRadar: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
                 {job.description}
               </p>
 
               {/* Required Skills breakdown */}
-              <div className="space-y-2 mb-4 pt-3 border-t border-slate-800">
-                <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold">
+              <div className="space-y-2 mb-4 pt-3 border-t border-slate-100">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Required Skill Stack vs Your Capabilities:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -177,13 +202,13 @@ export const OpportunityRadar: React.FC = () => {
                         key={req.skill}
                         className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-medium border ${
                           hasSkill
-                            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                            : 'bg-slate-950 text-slate-400 border-slate-800'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-slate-50 text-slate-500 border-slate-200'
                         }`}
                       >
                         <span>{req.skill}</span>
-                        <span className="text-[10px] font-mono">({req.level})</span>
-                        {hasSkill ? <span>✓</span> : <span className="text-rose-400">✕</span>}
+                        <span className="text-[10px] text-slate-400">({req.level})</span>
+                        {hasSkill ? <span className="text-emerald-600 font-bold">✓</span> : <span className="text-rose-500 font-bold">✕</span>}
                       </span>
                     );
                   })}
@@ -192,13 +217,37 @@ export const OpportunityRadar: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-2">
-                <span className="text-[11px] text-slate-500 font-mono">
+                <span className="text-[11px] text-slate-400">
                   Posted {job.postedDate} • {job.applicantsCount} verified applicants
                 </span>
 
                 <div className="flex items-center space-x-2">
+                  {(() => {
+                    const existingAnalysisId = getExistingAnalysisId(job.id, job.title);
+                    return (
+                      <>
+                        {existingAnalysisId && (
+                          <button
+                            onClick={() => onNavigate?.(`resume-analysis:${existingAnalysisId}`)}
+                            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-blue-50 text-blue-700 font-semibold text-xs hover:bg-blue-100 transition-all border border-blue-200 cursor-pointer"
+                          >
+                            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+                            <span>View Analysis</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleAnalyzeOpportunity(job)}
+                          className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs hover:bg-slate-200 transition-all border border-slate-200 cursor-pointer"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                          <span>{existingAnalysisId ? 'Re-analyze with AI' : 'Analyze with AI Skill Analyzer'}</span>
+                        </button>
+                      </>
+                    );
+                  })()}
+
                   {isApplied ? (
-                    <span className="px-4 py-2 rounded-xl bg-slate-800 text-teal-400 text-xs font-semibold flex items-center space-x-1.5">
+                    <span className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center space-x-1.5">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Application Submitted</span>
                     </span>
@@ -206,9 +255,9 @@ export const OpportunityRadar: React.FC = () => {
                     <button
                       onClick={() => handleApply(job)}
                       disabled={!isQualified}
-                      className="flex items-center space-x-2 px-5 py-2 rounded-xl bg-teal-400 text-slate-950 font-bold text-xs hover:bg-teal-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shadow-teal-500/10"
+                      className="flex items-center space-x-2 px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs"
                     >
-                      <span>{isQualified ? 'Apply with Verified Radar Profile' : 'Readiness Threshold Not Met'}</span>
+                      <span>{isQualified ? 'Apply with Verified Profile' : 'Readiness Threshold Not Met'}</span>
                       <Send className="w-3.5 h-3.5" />
                     </button>
                   )}

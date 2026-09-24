@@ -1,577 +1,560 @@
-import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
-import { SUPPORTED_ROLES } from '../../data/seedData';
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
-  Minus,
-  TrendingDown,
-  CheckCircle2,
-  AlertCircle,
-  FileCheck,
-  Video,
-  Award,
-  Layers,
-  Building2,
-  GraduationCap,
-  Users,
-  Compass,
-  Code2,
-  Briefcase,
+  Brain,
+  ChevronDown,
   ChevronRight,
-  ShieldAlert
-} from 'lucide-react';
-import { UserRole } from '../../types';
+  TrendingUp,
+  Target,
+  Map,
+  Zap,
+  BookOpen,
+  BarChart3,
+  ArrowRight,
+  CheckCircle2,
+  GraduationCap,
+  Building2,
+  Sparkles,
+} from "lucide-react";
+import { UserRole } from "../../types";
 
 interface LandingPageProps {
   onOpenAuth: (role?: UserRole) => void;
   onNavigateToStudent: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({
-  onOpenAuth,
-  onNavigateToStudent
-}) => {
-  const { industrySkills, isPrototypeData, demandLastUpdated, jobs } = useApp();
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('Java Backend Developer');
-  const [searchQuery, setSearchQuery] = useState('');
+function useFadeIn() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, visible };
+}
 
-  // Filter industry skills based on role and search query
-  const filteredSkills = industrySkills.filter((skill) => {
-    const matchesRole =
-      selectedRoleFilter === 'All Roles' ||
-      skill.role.toLowerCase() === selectedRoleFilter.toLowerCase() ||
-      selectedRoleFilter.includes(skill.role);
-    const matchesSearch =
-      skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      skill.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesRole && matchesSearch;
-  });
+function FadeSection({
+  children,
+  className = "",
+  delay = 0,
+  id,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  id?: string;
+}) {
+  const { ref, visible } = useFadeIn();
+  return (
+    <div
+      ref={ref}
+      id={id}
+      className={`${className} transition-all duration-700`}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transitionDelay: `${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
-  const timelineSteps = [
-    {
-      num: '01',
-      title: 'Discover Industry Demand',
-      desc: 'Real-time aggregated hiring requisitions from top tech enterprises show exact required skills.',
-      icon: Compass
-    },
-    {
-      num: '02',
-      title: 'Analyze Your Skills',
-      desc: 'Upload your resume or build your skill matrix with verified confidence ratings (Beginner, Intermediate, Advanced).',
-      icon: FileCheck
-    },
-    {
-      num: '03',
-      title: 'Find Your Skill Gap',
-      desc: 'AI comparison identifies Strong Skills, Needs Improvement, and Missing Skills required for your target role.',
-      icon: AlertCircle
-    },
-    {
-      num: '04',
-      title: 'Follow Your Roadmap',
-      desc: 'Execute a milestone-based Career Growth Roadmap with curated enterprise documentation and architecture patterns.',
-      icon: Layers
-    },
-    {
-      num: '05',
-      title: 'Complete Assignments',
-      desc: 'Solve real-world coding problems in the Skill Practice Lab evaluated across 4 technical rubrics.',
-      icon: Code2
-    },
-    {
-      num: '06',
-      title: 'Take AI Mock Interview',
-      desc: 'Engage with an adaptive AI interviewer with student camera, voice interaction, and integrity monitoring.',
-      icon: Video
-    },
-    {
-      num: '07',
-      title: 'Measure Career Readiness',
-      desc: 'Generate a transparent, verifiable readiness score reflecting proven capabilities, not just keywords.',
-      icon: Award
-    },
-    {
-      num: '08',
-      title: 'Discover Opportunities',
-      desc: 'Access verified job and internship openings curated specifically for your authenticated skill profile.',
-      icon: Briefcase
-    }
-  ];
+export function LandingPage({ onOpenAuth }: LandingPageProps) {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
-    <div className="relative overflow-hidden">
-      {/* Background Subtle Gradient Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none overflow-hidden -z-10 opacity-30">
-        <div className="absolute -top-32 left-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl" />
-      </div>
+    <div className="w-full bg-slate-50 text-slate-900 font-sans">
+      {/* ── HERO SECTION ── */}
+      <section
+        id="hero"
+        className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 bg-gradient-to-b from-white via-slate-50/50 to-slate-50"
+      >
+        {/* Ambient glow backgrounds */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-gradient-to-b from-blue-500/10 via-indigo-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* HERO SECTION */}
-      <section className="pt-16 pb-20 md:pt-24 md:pb-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Copy & CTAs */}
-          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
-              <span>Next-Gen Career Intelligence & Academic Alignment Platform</span>
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+          {/* Left Hero Text */}
+          <div
+            className="flex-1 text-center lg:text-left"
+            style={{ animation: "fadeSlideUp 0.7s ease both" }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-200 mb-6 shadow-xs">
+              <Zap className="w-3.5 h-3.5 text-blue-600" />
+              <span>AI-POWERED INDUSTRY SKILL INTELLIGENCE</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
-              Turn Your Skills Into{' '}
-              <span className="bg-gradient-to-r from-teal-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">
-                Real Opportunities.
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
+              Build the Skills{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">
+                Industry Needs.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Understand what the industry needs, discover your skill gaps, build the right skills, and prove your readiness before you apply.
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
+              An AI-powered platform that connects real industry demand to student skill development
+              and curriculum alignment — so every learning decision is backed by market intelligence.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3.5 justify-center lg:justify-start mb-8">
               <button
-                onClick={() => onOpenAuth('student')}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 font-bold text-sm hover:from-teal-400 hover:to-emerald-400 shadow-xl shadow-teal-500/20 hover:shadow-teal-500/35 transition-all"
+                onClick={() => onOpenAuth("student")}
+                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-sm hover:shadow hover:-translate-y-0.5 transition-all"
               >
-                <span>Start Your Career Analysis</span>
+                <Sparkles className="w-4 h-4" />
+                <span>Get Started</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => {
-                  document.getElementById('industry-skills')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-200 font-semibold text-sm hover:bg-slate-800 hover:border-slate-600 transition-all"
+                onClick={() => scrollTo("how-it-works")}
+                className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 hover:border-blue-400 px-6 py-3.5 rounded-xl shadow-xs transition-all font-medium"
               >
-                <span>Explore Industry Demand</span>
+                <span>Learn How It Works</span>
+                <ChevronDown className="w-4 h-4 text-slate-500" />
               </button>
             </div>
 
-            {/* Quick Micro-stats */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-slate-800/80">
-              <div>
-                <p className="text-2xl font-bold text-white tracking-tight">14+</p>
-                <p className="text-xs text-slate-400">Target Tech Roles</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-teal-400 tracking-tight">100%</p>
-                <p className="text-xs text-slate-400">Verified Rubrics</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-emerald-400 tracking-tight">0-to-1</p>
-                <p className="text-xs text-slate-400">Campus To Industry</p>
-              </div>
+            <div className="flex items-center justify-center lg:justify-start gap-2 text-xs text-slate-500 font-mono">
+              <span className="text-blue-600 font-bold">●</span> Industry Demand
+              <span className="text-slate-300">•</span>
+              <span className="text-indigo-600 font-bold">●</span> Skill Development
+              <span className="text-slate-300">•</span>
+              <span className="text-emerald-600 font-bold">●</span> Curriculum Alignment
             </div>
           </div>
 
-          {/* Right Column: Professional Interactive Dashboard Visual */}
-          <div className="lg:col-span-6 relative">
-            <div className="relative rounded-2xl glass-panel p-6 shadow-2xl shadow-teal-950/40 border border-slate-700/60 transition-all hover:border-teal-500/40">
-              {/* Header inside mockup */}
-              <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-800">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                  <span className="text-xs font-mono text-slate-400 pl-2">
-                    skill-gap-alignment://aarav-sharma.analysis
-                  </span>
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                  Target: Java Backend
+          {/* Right Concept Flow Card */}
+          <div
+            className="flex-1 max-w-md w-full"
+            style={{ animation: "fadeSlideUp 0.7s ease 0.15s both" }}
+          >
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-500 flex items-center gap-1.5 font-semibold">
+                  <Brain className="w-3.5 h-3.5 text-blue-600" />
+                  Concept Flow Architecture
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+                  Live Engine
                 </span>
               </div>
 
-              {/* Grid inside dashboard preview */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                {/* Metric 1: Career Readiness */}
-                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
-                  <span className="text-xs text-slate-400 font-medium">Career Readiness</span>
-                  <div className="flex items-baseline space-x-2 my-2">
-                    <span className="text-3xl font-extrabold text-teal-400">68%</span>
-                    <span className="text-xs text-teal-400/80">Benchmark 75%</span>
-                  </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-teal-500 to-emerald-400 h-2 rounded-full w-[68%] transition-all duration-1000" />
-                  </div>
-                </div>
-
-                {/* Metric 2: Skill Match */}
-                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
-                  <span className="text-xs text-slate-400 font-medium">Target Skill Match</span>
-                  <div className="flex items-baseline space-x-2 my-2">
-                    <span className="text-3xl font-extrabold text-white">72%</span>
-                    <span className="text-xs text-slate-400">Role Stack</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-[11px] text-slate-400">
-                    <span className="text-teal-400 font-semibold">5 Matched</span>
-                    <span>•</span>
-                    <span className="text-amber-400 font-semibold">3 Missing</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Micro Breakdown: Industry Demand vs Skill Gap */}
-              <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800/80 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-200">Role Skills vs Gaps</span>
-                  <span className="text-slate-400 font-mono text-[11px]">ABC Technologies Requisition</span>
-                </div>
-
-                <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />
-                      <span className="text-slate-300 font-medium">Core Java</span>
+              <div className="space-y-3">
+                {[
+                  {
+                    Icon: TrendingUp,
+                    color: "blue",
+                    label: "Industry Demand",
+                    desc: "Real-time skill signals from live market data",
+                  },
+                  {
+                    Icon: BarChart3,
+                    color: "indigo",
+                    label: "Required Skills",
+                    desc: "What companies are hiring for right now",
+                  },
+                  {
+                    Icon: Target,
+                    color: "amber",
+                    label: "Skill Gap Analysis",
+                    desc: "AI-detected gaps compared with your profile",
+                  },
+                  {
+                    Icon: Map,
+                    color: "emerald",
+                    label: "Skill Development",
+                    desc: "Personalized milestone learning roadmap",
+                  },
+                ].map(({ Icon, color, label, desc }, i) => (
+                  <React.Fragment key={label}>
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50/90 border border-slate-200/80 hover:border-slate-300 transition-colors">
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                          color === "blue"
+                            ? "bg-blue-50 border border-blue-200 text-blue-600"
+                            : color === "indigo"
+                            ? "bg-indigo-50 border border-indigo-200 text-indigo-600"
+                            : color === "amber"
+                            ? "bg-amber-50 border border-amber-200 text-amber-600"
+                            : "bg-emerald-50 border border-emerald-200 text-emerald-600"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{label}</p>
+                        <p className="text-xs text-slate-500">{desc}</p>
+                      </div>
                     </div>
-                    <span className="text-teal-400 font-mono text-[11px]">Advanced (Verified)</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />
-                      <span className="text-slate-300 font-medium">SQL & Relational DB</span>
-                    </div>
-                    <span className="text-teal-400 font-mono text-[11px]">Intermediate</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
-                      <span className="text-slate-300 font-medium">Spring Boot Microservices</span>
-                    </div>
-                    <span className="text-rose-400 font-mono text-[11px] font-semibold">Critical Gap (84% Demand)</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-slate-300 font-medium">REST API Design</span>
-                    </div>
-                    <span className="text-amber-400 font-mono text-[11px]">Practice Lab Recommended</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Highlight Card */}
-              <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-teal-950/60 to-slate-900 border border-teal-500/30 flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <Video className="w-4 h-4 text-teal-400" />
-                  <div className="text-left">
-                    <p className="text-xs font-semibold text-white">AI Mock Interview Verified</p>
-                    <p className="text-[10px] text-slate-400">Technical Score: 82% • Low Integrity Risk</p>
-                  </div>
-                </div>
-                <span className="px-2 py-1 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300">
-                  Ready to Apply
-                </span>
+                    {i < 3 && (
+                      <div className="flex justify-center my-0.5">
+                        <ChevronRight className="w-4 h-4 text-slate-300 rotate-90" />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS SECTION (PART 4) */}
-      <section id="how-it-works" className="py-20 bg-slate-900/50 border-y border-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-teal-400 font-mono">
-              The Student Journey
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              From Campus Confusion to Industry Preparedness
-            </h2>
-            <p className="text-sm text-slate-400">
-              A continuous, evidence-backed pipeline answering: What should you learn, why should you learn it, and how does it prove your hiring readiness?
+      {/* ── WHY SECTION (id="industry-skills") ── */}
+      <section id="industry-skills" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <FadeSection className="text-center mb-14">
+            <p className="text-xs font-mono font-semibold uppercase tracking-widest text-blue-600 mb-2">
+              WHY INDUSTRY SKILL INTELLIGENCE?
             </p>
-          </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+              Connecting Industry Needs With Skill Development.
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              Most students graduate without knowing what industry actually needs. Most curricula are
+              updated years too late. This platform closes that loop with AI.
+            </p>
+          </FadeSection>
 
-          {/* Clean Visual Timeline */}
+          {/* 4 Feature Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {timelineSteps.map((step) => {
-              const Icon = step.icon;
-              return (
-                <div
-                  key={step.num}
-                  className="relative p-6 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-teal-500/40 transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-black font-mono text-slate-600 group-hover:text-teal-400 transition-colors">
-                      {step.num}
-                    </span>
-                    <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform">
-                      <Icon className="w-5 h-5" />
-                    </div>
+            {[
+              {
+                Icon: TrendingUp,
+                color: "blue",
+                title: "Industry Demand",
+                body: "Live signals from job postings, industry shifts, and market data reveal which skills employers are hiring for right now.",
+              },
+              {
+                Icon: Brain,
+                color: "indigo",
+                title: "AI Skill Gap Analysis",
+                body: "Our AI engine compares your current skills against industry benchmarks to surface the exact gaps you need to close.",
+              },
+              {
+                Icon: Map,
+                color: "emerald",
+                title: "Personalized Development",
+                body: "Receive a step-by-step skill development roadmap, practice assignments, and AI mock interviews tailored to your target role.",
+              },
+              {
+                Icon: BookOpen,
+                color: "amber",
+                title: "Curriculum Intelligence",
+                body: "Colleges get data-driven insights to align their programs with industry reality — before students graduate unprepared.",
+              },
+            ].map(({ Icon, color, title, body }, i) => (
+              <FadeSection key={title} delay={i * 80}>
+                <div className="h-full bg-slate-50/80 border border-slate-200/90 rounded-2xl p-6 shadow-xs hover:border-blue-300 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                      color === "blue"
+                        ? "bg-blue-50 border border-blue-200 text-blue-600"
+                        : color === "indigo"
+                        ? "bg-indigo-50 border border-indigo-200 text-indigo-600"
+                        : color === "emerald"
+                        ? "bg-emerald-50 border border-emerald-200 text-emerald-600"
+                        : "bg-amber-50 border border-amber-200 text-amber-600"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-teal-300 transition-colors">
-                    {step.title}
+                  <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                    {title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    {step.desc}
-                  </p>
+                  <p className="text-sm text-slate-600 leading-relaxed">{body}</p>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* INDUSTRY DEMAND PREVIEW SECTION (PART 5 & PART 9) */}
-      <section id="industry-skills" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-400 font-mono">
-                Industry Demand Engine
-              </span>
-              {isPrototypeData && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  Prototype / Sample Industry Data
-                </span>
-              )}
-            </div>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
-              Top Skills Currently in Demand
-            </h2>
-            <p className="text-xs text-slate-400">
-              Demand data updated on: <span className="text-teal-300 font-medium">{demandLastUpdated}</span>
-            </p>
-          </div>
-
-          {/* Role Filter Selector */}
-          <div className="flex flex-wrap gap-2">
-            {['Java Backend Developer', 'Frontend Developer', 'AI/ML Engineer', 'Cloud / DevOps Engineer', 'All Roles'].map((role) => (
-              <button
-                key={role}
-                onClick={() => setSelectedRoleFilter(role)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  selectedRoleFilter === role
-                    ? 'bg-teal-500 text-slate-950 font-semibold shadow-md shadow-teal-500/20'
-                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
-                }`}
-              >
-                {role}
-              </button>
+              </FadeSection>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Skill Demand Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredSkills.slice(0, 9).map((skill) => {
-            const isGrowing = skill.trend === 'Growing';
-            const isDeclining = skill.trend === 'Declining';
+      {/* ── HOW IT WORKS SECTION (id="how-it-works") ── */}
+      <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto">
+          <FadeSection className="text-center mb-14">
+            <p className="text-xs font-mono font-semibold uppercase tracking-widest text-blue-600 mb-2">
+              HOW IT WORKS
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+              Four Steps from Demand to Readiness.
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto">
+              The platform handles everything between industry signal and career confidence.
+            </p>
+          </FadeSection>
 
-            return (
-              <div
-                key={skill.id}
-                className="p-5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-teal-500/40 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
-                        {skill.category}
-                      </span>
-                      <h4 className="text-base font-bold text-white mt-1.5">{skill.name}</h4>
-                    </div>
-
-                    {/* Trend Indicator */}
-                    <div
-                      className={`flex items-center space-x-1 px-2 py-0.5 rounded text-xs font-semibold ${
-                        isGrowing
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : isDeclining
-                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700'
-                      }`}
-                    >
-                      {isGrowing ? (
-                        <TrendingUp className="w-3.5 h-3.5" />
-                      ) : isDeclining ? (
-                        <TrendingDown className="w-3.5 h-3.5" />
-                      ) : (
-                        <Minus className="w-3.5 h-3.5" />
-                      )}
-                      <span>{skill.trend}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                step: "01",
+                Icon: TrendingUp,
+                title: "Understand Demand",
+                body: "The platform ingests live industry data to map which skills and roles are in demand across sectors.",
+              },
+              {
+                step: "02",
+                Icon: Target,
+                title: "Identify Your Gap",
+                body: "AI analyses your skills profile against industry benchmarks and pinpoints precise skill gaps.",
+              },
+              {
+                step: "03",
+                Icon: Map,
+                title: "Develop Strategically",
+                body: "Follow a personalised roadmap, complete practice projects, and build portfolio evidence.",
+              },
+              {
+                step: "04",
+                Icon: Zap,
+                title: "Improve & Interview",
+                body: "AI mock interviews give feedback on readiness. Track your career confidence score in real time.",
+              },
+            ].map(({ step, Icon, title, body }, i) => (
+              <FadeSection key={step} delay={i * 100}>
+                <div className="h-full bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs hover:border-blue-300 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-3xl font-black font-mono text-slate-200 group-hover:text-blue-200 transition-colors">
+                      {step}
+                    </span>
+                    <div className="w-9 h-9 bg-blue-50 border border-blue-200 text-blue-600 rounded-lg flex items-center justify-center">
+                      <Icon className="w-4 h-4" />
                     </div>
                   </div>
-
-                  {/* Demand Percentage Bar */}
-                  <div className="space-y-1.5 my-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Industry Requisitions</span>
-                      <span className="font-mono font-bold text-white">{skill.demandScore}%</span>
-                    </div>
-                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-teal-500 to-emerald-400 h-2 rounded-full"
-                        style={{ width: `${skill.demandScore}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                    {skill.whyItMatters}
-                  </p>
+                  <h3 className="text-base font-bold text-slate-900 mb-2">{title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{body}</p>
                 </div>
-
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                  <span>{skill.totalObservations.toLocaleString()} postings</span>
-                  <span className="capitalize">{skill.importance} Priority</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Explore More Note */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => onOpenAuth('student')}
-            className="inline-flex items-center space-x-2 text-xs font-semibold text-teal-400 hover:text-teal-300 transition-colors"
-          >
-            <span>Sign in to unlock customized skill gap analysis across 14+ careers</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+              </FadeSection>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* STAKEHOLDERS ECOSYSTEM SECTION (PART 2) */}
-      <section id="stakeholders" className="py-20 bg-slate-900/30 border-t border-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-teal-400 font-mono">
-              Unified Career Intelligence
-            </span>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
-              One Ecosystem. Four Specialized Portals.
+      {/* ── WHO IS IT FOR SECTION (id="stakeholders") ── */}
+      <section id="stakeholders" className="py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <FadeSection className="text-center mb-14">
+            <p className="text-xs font-mono font-semibold uppercase tracking-widest text-blue-600 mb-2">
+              WHO IS IT FOR
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+              One Platform. Three Stakeholders.
             </h2>
-          </div>
+            <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto">
+              Students, colleges, and employers each get a dedicated experience.
+            </p>
+          </FadeSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Student Card */}
-            <div className="p-8 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-teal-500/50 transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 mb-6">
-                  <Users className="w-6 h-6" />
+            {[
+              {
+                Icon: GraduationCap,
+                role: "student" as UserRole,
+                audience: "Students",
+                color: "blue",
+                tagline: "Know what to learn before you graduate.",
+                points: [
+                  "AI Skill Gap Analysis vs. target role",
+                  "Personalised 8-step career roadmap",
+                  "Practice projects & mock interviews",
+                  "Career readiness score & opportunity match",
+                ],
+                cta: "Start as a Student",
+                sectionId: "for-students",
+              },
+              {
+                Icon: BookOpen,
+                role: "college" as UserRole,
+                audience: "Colleges",
+                color: "amber",
+                tagline: "Align your curriculum with market reality.",
+                points: [
+                  "Curriculum gap dashboard per department",
+                  "Industry demand mapping to your courses",
+                  "Student batch readiness analytics",
+                  "Placement outcome intelligence",
+                ],
+                cta: "Start as a College",
+                sectionId: "for-colleges",
+              },
+              {
+                Icon: Building2,
+                role: "company" as UserRole,
+                audience: "Employers",
+                color: "indigo",
+                tagline: "Find candidates who match what you need.",
+                points: [
+                  "Post skill-based requirements, not just JDs",
+                  "AI-matched candidate shortlisting",
+                  "Campus hiring pipeline management",
+                  "Workforce demand intelligence dashboard",
+                ],
+                cta: "Start as an Employer",
+                sectionId: "for-employers",
+              },
+            ].map(({ Icon, role, audience, color, tagline, points, cta, sectionId }, i) => (
+              <FadeSection key={audience} delay={i * 100} id={sectionId}>
+                <div
+                  className={`h-full rounded-2xl p-7 flex flex-col border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    color === "blue"
+                      ? "border-blue-200 bg-gradient-to-b from-blue-50/40 via-white to-white hover:border-blue-300"
+                      : color === "amber"
+                      ? "border-amber-200 bg-gradient-to-b from-amber-50/40 via-white to-white hover:border-amber-300"
+                      : "border-indigo-200 bg-gradient-to-b from-indigo-50/40 via-white to-white hover:border-indigo-300"
+                  }`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
+                      color === "blue"
+                        ? "bg-blue-50 text-blue-600 border border-blue-200"
+                        : color === "amber"
+                        ? "bg-amber-50 text-amber-600 border border-amber-200"
+                        : "bg-indigo-50 text-indigo-600 border border-indigo-200"
+                    }`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs font-mono uppercase tracking-wider text-slate-500 mb-1 font-semibold">{audience}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">{tagline}</h3>
+                  <ul className="space-y-2.5 mb-6 flex-1">
+                    {points.map((p) => (
+                      <li key={p} className="flex items-start gap-2.5 text-sm text-slate-600">
+                        <CheckCircle2
+                          className={`w-4 h-4 mt-0.5 shrink-0 ${
+                            color === "blue"
+                              ? "text-blue-600"
+                              : color === "amber"
+                              ? "text-amber-600"
+                              : "text-indigo-600"
+                          }`}
+                        />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => onOpenAuth(role)}
+                    className={`w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm ${
+                      color === "blue"
+                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10"
+                        : color === "amber"
+                        ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-500/10"
+                        : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/10"
+                    }`}
+                  >
+                    {cta}
+                  </button>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">For Students</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
-                  Stop shooting in the dark. Know exactly which skills companies expect, pinpoint your specific gaps, and practice with real assignments and mock interviews.
-                </p>
-                <ul className="space-y-2.5 text-xs text-slate-300 mb-8">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>Resume Scanner & Manual Matrix</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>Personalized Step-by-Step Roadmap</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0" />
-                    <span>AI Video Interview with Integrity Monitor</span>
-                  </li>
-                </ul>
-              </div>
-              <button
-                onClick={() => onOpenAuth('student')}
-                className="w-full py-2.5 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold hover:bg-teal-500 hover:text-slate-950 transition-all"
-              >
-                Access Student Portal
-              </button>
-            </div>
-
-            {/* College Card */}
-            <div className="p-8 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-6">
-                  <GraduationCap className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">For Colleges</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
-                  Bridge academic syllabus to market expectations. Map curriculum against live industry demand and track whole cohort placement readiness.
-                </p>
-                <ul className="space-y-2.5 text-xs text-slate-300 mb-8">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Curriculum-to-Industry Skill Mapping</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Cohort Readiness & Gap Heatmaps</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Placement Forecasting Analytics</span>
-                  </li>
-                </ul>
-              </div>
-              <button
-                onClick={() => onOpenAuth('college')}
-                className="w-full py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-amber-500 hover:text-slate-950 transition-all"
-              >
-                Access College Portal
-              </button>
-            </div>
-
-            {/* Company Card */}
-            <div className="p-8 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-indigo-500/50 transition-all flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">For Companies</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
-                  Filter candidates by verified capabilities rather than hollow keywords. Post jobs with weighted requirements and minimum readiness thresholds.
-                </p>
-                <ul className="space-y-2.5 text-xs text-slate-300 mb-8">
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Weighted Requisition Definition</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Candidate Talent Radar with Match Filtering</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-                    <span>Verified Interview & Lab Evidence Access</span>
-                  </li>
-                </ul>
-              </div>
-              <button
-                onClick={() => onOpenAuth('company')}
-                className="w-full py-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold hover:bg-indigo-500 hover:text-slate-950 transition-all"
-              >
-                Access Company Portal
-              </button>
-            </div>
+              </FadeSection>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CALL TO ACTION BANNER */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl p-8 sm:p-12 overflow-hidden bg-gradient-to-r from-teal-950/80 via-slate-900 to-indigo-950/80 border border-teal-500/30 shadow-2xl">
-          <div className="relative z-10 max-w-2xl space-y-4">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Ready to See Where You Stand in the Industry?
-            </h2>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Launch your career analysis today. Discover your skill gaps against real requisitions from companies like ABC Technologies and build a verified profile.
-            </p>
-            <div className="pt-2">
-              <button
-                onClick={() => onOpenAuth('student')}
-                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-teal-400 text-slate-950 font-bold text-sm hover:bg-teal-300 transition-all shadow-lg shadow-teal-500/20"
-              >
-                <span>Launch Career Radar Now</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+      {/* ── DIFFERENTIATOR SECTION ── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/80 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <FadeSection>
+            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-blue-50/80 via-white to-indigo-50/80 p-8 sm:p-12 text-center shadow-xs">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-indigo-500/5 pointer-events-none" />
+
+              <p className="text-xs font-mono font-semibold uppercase tracking-widest text-blue-600 mb-3">
+                WHAT MAKES THIS DIFFERENT
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
+                Don&apos;t Just Learn More.{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                  Learn What Matters.
+                </span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mb-10">
+                Generic courses teach skills in the abstract. This platform starts with what industry
+                demands today and works backwards to exactly what you should learn next.
+              </p>
+
+              {/* Flow Visual Badges */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap relative z-10">
+                {[
+                  "Industry Signal",
+                  "Role Requirements",
+                  "Skill Gap",
+                  "Learning Path",
+                  "Career Readiness",
+                ].map((label, i, arr) => (
+                  <React.Fragment key={label}>
+                    <div className="bg-white border border-slate-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 shadow-xs">
+                      {label}
+                    </div>
+                    {i < arr.length - 1 && (
+                      <ChevronRight className="w-4 h-4 text-blue-600 shrink-0 hidden sm:block" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
-          </div>
+          </FadeSection>
         </div>
       </section>
+
+      {/* ── FINAL CTA SECTION ── */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-3xl mx-auto text-center">
+          <FadeSection>
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-14 relative overflow-hidden shadow-sm">
+              <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Ready to Understand Your Skill Gap?
+              </h2>
+              <p className="text-base text-slate-600 mb-8 max-w-xl mx-auto">
+                Join students, colleges, and employers who are using real industry intelligence
+                to make smarter skill development decisions.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => onOpenAuth("student")}
+                  className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-sm hover:shadow hover:-translate-y-0.5 transition-all"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Get Started</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onOpenAuth("student")}
+                  className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold px-8 py-3.5 rounded-xl shadow-xs transition-all"
+                >
+                  Login to Your Account
+                </button>
+              </div>
+            </div>
+          </FadeSection>
+        </div>
+      </section>
+
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
-};
+}

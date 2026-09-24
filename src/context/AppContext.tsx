@@ -12,7 +12,9 @@ import {
   Assignment,
   InterviewResult,
   StudentSkill,
-  SkillLevel
+  SkillLevel,
+  ResumeRecord,
+  ResumeAnalysisRecord
 } from '../types';
 import {
   INITIAL_USERS,
@@ -25,6 +27,14 @@ import {
   INITIAL_ROADMAP_STEPS,
   INITIAL_ASSIGNMENTS
 } from '../data/seedData';
+import {
+  AuthService,
+  LoginCredentials,
+  AuthResponse,
+  GoogleProfile,
+  AuthSession
+} from '../services/auth';
+import type { AnalysisRecord } from '../../server/types';
 
 interface AppContextType {
   currentUser: User | null;
@@ -38,9 +48,16 @@ interface AppContextType {
   roadmap: RoadmapStep[];
   assignments: Assignment[];
   interviewResults: InterviewResult[];
+  resumeLibrary: ResumeRecord[];
+  selectedResumeId: string | null;
+  selectedOpportunityContext: JobRequirement | null;
+  analysisHistory: ResumeAnalysisRecord[];
+  latestAnalysis: AnalysisRecord | null;
   isPrototypeData: boolean;
   demandLastUpdated: string;
   login: (role: UserRole, email?: string) => void;
+  loginWithCredentials: (credentials: LoginCredentials) => Promise<AuthResponse>;
+  loginWithGoogle: (targetRole: UserRole, profile: GoogleProfile) => Promise<AuthResponse>;
   logout: () => void;
   setStudentProfile: React.Dispatch<React.SetStateAction<StudentProfile>>;
   updateStudentSkills: (skills: StudentSkill[]) => void;
@@ -53,22 +70,47 @@ interface AppContextType {
   addIndustrySkill: (skill: Omit<IndustrySkill, 'id'>) => void;
   togglePrototypeLabel: () => void;
   calculateReadiness: (skills: StudentSkill[], targetRole: string, companyName?: string) => number;
+  setSelectedResumeId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedOpportunityContext: React.Dispatch<React.SetStateAction<JobRequirement | null>>;
+  setResumeLibrary: React.Dispatch<React.SetStateAction<ResumeRecord[]>>;
+  setAnalysisHistory: React.Dispatch<React.SetStateAction<ResumeAnalysisRecord[]>>;
+  setLatestAnalysis: React.Dispatch<React.SetStateAction<AnalysisRecord | null>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'campus_radar_state_v1';
+const LOCAL_STORAGE_KEY = 'skill_platform_state_v1';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load initial state with local storage fallback
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    // 1. Check verified session from AuthService
+    const session = AuthService.getInstance().getCurrentSession();
+    if (session?.user) {
+      return session.user;
+    }
+    // 2. Fallback to persisted user
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_user`);
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    try {
+      const u = JSON.parse(saved);
+      if (u.name === 'Aarav Sharma') u.name = 'N.Lakshman';
+      return u;
+    } catch {
+      return null;
+    }
   });
 
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_student`);
-    return saved ? JSON.parse(saved) : INITIAL_STUDENT_PROFILE;
+    if (!saved) return INITIAL_STUDENT_PROFILE;
+    try {
+      const p = JSON.parse(saved);
+      if (p.fullName === 'Aarav Sharma') p.fullName = 'N.Lakshman';
+      return p;
+    } catch {
+      return INITIAL_STUDENT_PROFILE;
+    }
   });
 
   const [industrySkills, setIndustrySkills] = useState<IndustrySkill[]>(() => {
@@ -102,6 +144,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [interviewResults, setInterviewResults] = useState<InterviewResult[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_interviews`);
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [resumeLibrary, setResumeLibrary] = useState<ResumeRecord[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_resumes`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [selectedResumeId, setSelectedResumeId] = useState<string | null>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_selectedResume`);
+    return saved || null;
+  });
+
+  const [selectedOpportunityContext, setSelectedOpportunityContext] = useState<JobRequirement | null>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_selectedOpportunity`);
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [analysisHistory, setAnalysisHistory] = useState<ResumeAnalysisRecord[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_analysisHistory`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [latestAnalysis, setLatestAnalysis] = useState<AnalysisRecord | null>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_latestAnalysis`);
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [isPrototypeData, setIsPrototypeData] = useState<boolean>(true);
@@ -139,6 +206,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(`${LOCAL_STORAGE_KEY}_interviews`, JSON.stringify(interviewResults));
   }, [interviewResults]);
+
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_resumes`, JSON.stringify(resumeLibrary));
+  }, [resumeLibrary]);
+
+  useEffect(() => {
+    if (selectedResumeId) {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_selectedResume`, JSON.stringify(selectedResumeId));
+    } else {
+      localStorage.removeItem(`${LOCAL_STORAGE_KEY}_selectedResume`);
+    }
+  }, [selectedResumeId]);
+
+  useEffect(() => {
+    if (selectedOpportunityContext) {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_selectedOpportunity`, JSON.stringify(selectedOpportunityContext));
+    } else {
+      localStorage.removeItem(`${LOCAL_STORAGE_KEY}_selectedOpportunity`);
+    }
+  }, [selectedOpportunityContext]);
+
+  useEffect(() => {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_analysisHistory`, JSON.stringify(analysisHistory));
+  }, [analysisHistory]);
+
+  useEffect(() => {
+    if (latestAnalysis) {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_latestAnalysis`, JSON.stringify(latestAnalysis));
+    } else {
+      localStorage.removeItem(`${LOCAL_STORAGE_KEY}_latestAnalysis`);
+    }
+  }, [latestAnalysis]);
 
   // Dynamic Career Readiness Engine
   const calculateReadiness = (skills: StudentSkill[], targetRole: string, companyName?: string): number => {
@@ -194,6 +293,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return Math.min(99, Math.max(15, score));
   };
 
+  const loginWithCredentials = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const authService = AuthService.getInstance();
+    const result = await authService.loginWithCredentials(credentials);
+    if (result.success && result.session) {
+      setCurrentUser(result.session.user);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_user`, JSON.stringify(result.session.user));
+    }
+    return result;
+  };
+
+  const loginWithGoogle = async (targetRole: UserRole, profile: GoogleProfile): Promise<AuthResponse> => {
+    const authService = AuthService.getInstance();
+    const result = await authService.loginWithGoogle(targetRole, profile);
+    if (result.success && result.session) {
+      setCurrentUser(result.session.user);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_user`, JSON.stringify(result.session.user));
+    }
+    return result;
+  };
+
   const login = (role: UserRole, email?: string) => {
     const userMatch = INITIAL_USERS.find((u) => u.role === role);
     if (userMatch) {
@@ -202,10 +321,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         email: email || userMatch.email
       };
       setCurrentUser(activeUser);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_user`, JSON.stringify(activeUser));
     }
   };
 
   const logout = () => {
+    AuthService.getInstance().logout();
+    localStorage.removeItem(`${LOCAL_STORAGE_KEY}_user`);
     setCurrentUser(null);
   };
 
@@ -248,14 +370,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const completeRoadmapStep = (stepId: string) => {
-    setRoadmap((prev) =>
-      prev.map((step) => {
+    setRoadmap((prev) => {
+      const targetIndex = prev.findIndex((s) => s.id === stepId);
+      const updated = prev.map((step, idx) => {
         if (step.id === stepId) {
-          return { ...step, status: 'completed' };
+          return { ...step, status: 'completed' as const };
+        }
+        if (targetIndex !== -1 && idx === targetIndex + 1 && step.status === 'locked') {
+          return { ...step, status: 'in-progress' as const };
         }
         return step;
-      })
-    );
+      });
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_roadmap`, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   };
 
   // AI Evaluation logic for Assignment submission
@@ -438,9 +568,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         roadmap,
         assignments,
         interviewResults,
+        resumeLibrary,
+        selectedResumeId,
+        selectedOpportunityContext,
+        analysisHistory,
+        latestAnalysis,
         isPrototypeData,
         demandLastUpdated,
         login,
+        loginWithCredentials,
+        loginWithGoogle,
         logout,
         setStudentProfile,
         updateStudentSkills,
@@ -452,7 +589,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateIndustrySkill,
         addIndustrySkill,
         togglePrototypeLabel,
-        calculateReadiness
+        calculateReadiness,
+        setSelectedResumeId,
+        setSelectedOpportunityContext,
+        setResumeLibrary,
+        setAnalysisHistory,
+        setLatestAnalysis
       }}
     >
       {children}
