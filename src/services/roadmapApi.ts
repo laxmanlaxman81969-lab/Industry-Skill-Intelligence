@@ -58,6 +58,9 @@ const getApiBaseUrl = (): string => {
 };
 
 const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeoutMs = 3500): Promise<Response> => {
+  if (typeof window === 'undefined' && !url.startsWith('http')) {
+    throw new Error('Relative URL not supported in Node environment');
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
