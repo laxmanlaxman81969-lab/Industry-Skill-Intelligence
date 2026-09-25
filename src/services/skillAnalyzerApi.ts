@@ -98,6 +98,7 @@ export interface ParsedApiResponse<T = any> {
   isJson: boolean;
   status: number;
   statusText: string;
+  rawText?: string;
   error?: string;
 }
 
@@ -117,6 +118,7 @@ const safeParseJson = async <T = any>(res: Response): Promise<ParsedApiResponse<
       isJson: false,
       status: res.status,
       statusText: res.statusText,
+      rawText,
       error: `Server returned non-JSON content (${ct || 'unknown'}). Status: ${res.status}`
     };
   }
@@ -127,6 +129,7 @@ const safeParseJson = async <T = any>(res: Response): Promise<ParsedApiResponse<
       isJson: false,
       status: res.status,
       statusText: res.statusText,
+      rawText,
       error: `Server returned empty response. Status: ${res.status}`
     };
   }
@@ -137,7 +140,8 @@ const safeParseJson = async <T = any>(res: Response): Promise<ParsedApiResponse<
       data: parsed as T,
       isJson: true,
       status: res.status,
-      statusText: res.statusText
+      statusText: res.statusText,
+      rawText
     };
   } catch {
     return {
@@ -145,6 +149,7 @@ const safeParseJson = async <T = any>(res: Response): Promise<ParsedApiResponse<
       isJson: false,
       status: res.status,
       statusText: res.statusText,
+      rawText,
       error: `Failed to parse JSON response. Status: ${res.status}`
     };
   }
@@ -167,7 +172,9 @@ const handleApiError = (parsed: ParsedApiResponse, defaultMsg: string): never =>
     throw new Error((parsed.data as any).error);
   }
   if (!parsed.isJson) {
-    throw new Error(`Unexpected server response (HTTP ${parsed.status} ${parsed.statusText}).`);
+    const cleanSnippet = (parsed.rawText || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150);
+    const detail = cleanSnippet ? `: ${cleanSnippet}` : '';
+    throw new Error(`Unexpected server response (HTTP ${parsed.status} ${parsed.statusText || 'Error'})${detail}`);
   }
   throw new Error(defaultMsg);
 };

@@ -46,11 +46,25 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // Request logging and Vercel path normalization middleware
 app.use((req, _res, next) => {
-  const matched = (req.headers['x-matched-path'] || req.headers['x-rewrite-url'] || req.headers['x-original-url']) as string | undefined;
-  if (matched && (req.url === '/api' || req.url === '/api/') && matched !== '/api') {
-    req.url = matched;
+  const original = (
+    req.headers['x-matched-path'] ||
+    req.headers['x-rewrite-url'] ||
+    req.headers['x-original-url'] ||
+    req.originalUrl
+  ) as string | undefined;
+
+  const isVercelRewriteDestination =
+    req.url === '/api' ||
+    req.url === '/api/' ||
+    req.url === '/api/index.js' ||
+    req.url === '/api/index' ||
+    req.url === '/' ||
+    req.url === '';
+
+  if (original && isVercelRewriteDestination && original !== req.url && original.startsWith('/api')) {
+    req.url = original;
   }
-  console.log(`[HTTP] ${req.method} ${req.url}`);
+  console.log(`[HTTP] ${req.method} ${req.url} (original: ${original || req.url})`);
   next();
 });
 
