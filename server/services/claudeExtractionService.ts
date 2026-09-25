@@ -2,7 +2,6 @@
 // Calls Claude Messages API with strict JSON schema, single-retry resilience,
 // and MANDATORY SERVER-SIDE ANTI-HALLUCINATION EVIDENCE VERIFICATION
 
-import Anthropic from '@anthropic-ai/sdk';
 import {
   ClaudeStructuredExtraction,
   ClaimedSkillItem,
@@ -23,14 +22,24 @@ export interface ClaudeExtractionResult {
 export class ClaudeExtractionService {
   private static instance: ClaudeExtractionService;
   private db = Database.getInstance();
-  private anthropic: Anthropic | null = null;
+  private anthropic: any = null;
   private apiKey: string = '';
 
   private constructor() {
     this.apiKey = process.env.ANTHROPIC_API_KEY || '';
-    if (this.apiKey) {
-      this.anthropic = new Anthropic({ apiKey: this.apiKey });
+  }
+
+  private async getClient() {
+    if (!this.anthropic && this.apiKey) {
+      try {
+        const mod = await import('@anthropic-ai/sdk');
+        const AnthropicClass = mod.default || mod;
+        this.anthropic = new AnthropicClass({ apiKey: this.apiKey });
+      } catch (e) {
+        console.warn('[Claude] Could not load @anthropic-ai/sdk:', e);
+      }
     }
+    return this.anthropic;
   }
 
   public static getInstance(): ClaudeExtractionService {

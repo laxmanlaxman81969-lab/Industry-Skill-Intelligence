@@ -5,12 +5,20 @@
 
 import crypto from 'crypto';
 import zlib from 'zlib';
-import mammoth from 'mammoth';
-import { PDFParse } from 'pdf-parse';
 import { ParsedResumeDocument } from '../types';
 import { Database } from '../db/database';
 import { OCRService } from './ocrService';
 import { SectionDetector } from './sectionDetector';
+
+async function getMammoth() {
+  const mod = await import('mammoth');
+  return mod.default || mod;
+}
+
+async function getPDFParser() {
+  const mod = await import('pdf-parse');
+  return mod.PDFParse || (mod as any).default?.PDFParse || (mod as any).default;
+}
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 const MIN_WORDS_REQUIRED = 15;
@@ -197,7 +205,8 @@ export class FileParserService {
       // ── DOCX ────────────────────────────────────────────────────────────
       else if (detectedType === 'docx') {
         if (onStatusUpdate) onStatusUpdate('Extracting DOCX content...');
-        const mammothResult = await mammoth.extractRawText({ buffer });
+        const mammothLib = await getMammoth();
+        const mammothResult = await mammothLib.extractRawText({ buffer });
         rawText = mammothResult.value || '';
         extractionMethod = 'mammoth-docx';
       }
@@ -248,7 +257,8 @@ export class FileParserService {
         if (onStatusUpdate) onStatusUpdate('Extracting PDF text...');
         let parser: any = null;
         try {
-          parser = new PDFParse({ data: buffer });
+          const PDFParserClass = await getPDFParser();
+          parser = new PDFParserClass({ data: buffer });
           const pdfData = await parser.getText();
           rawText = pdfData?.text || '';
           extractionMethod = 'pdf-parse';

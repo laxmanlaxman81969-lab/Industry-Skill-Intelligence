@@ -7,7 +7,7 @@
     "dev": "concurrently -k -n \"VITE,API\" -c \"blue,green\" \"vite\" \"tsx server/localServer.ts\"",
     "dev:frontend": "vite",
     "server": "tsx server/localServer.ts",
-    "build": "tsc -b && vite build && esbuild server/apiEntry.ts --bundle --platform=node --format=esm --target=node18 --packages=external --outfile=api/index.js",
+    "build": "tsc -b && vite build && esbuild server/apiEntry.ts --bundle --platform=node --format=esm --target=node18 --external:tesseract.js --outfile=api/index.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },
