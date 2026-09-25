@@ -69,7 +69,7 @@ app.use((req, _res, next) => {
 });
 
 // Health check endpoint
-app.get(['/api/health', '/health'], (_req, res) => {
+app.get(['/api', '/api/health', '/health'], (_req, res) => {
   res.json({
     status: 'ok',
     service: 'industry-skill-intelligence-api',

@@ -7566,7 +7566,7 @@ app.use((req, _res, next) => {
   console.log(`[HTTP] ${req.method} ${req.url} (original: ${original || req.url})`);
   next();
 });
-app.get(["/api/health", "/health"], (_req, res) => {
+app.get(["/api", "/api/health", "/health"], (_req, res) => {
   res.json({
     status: "ok",
     service: "industry-skill-intelligence-api",
