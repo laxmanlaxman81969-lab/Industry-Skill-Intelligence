@@ -15,6 +15,7 @@ import { UserRoadmapProgress } from '../roadmapTypes';
 
 const DB_DIR = path.resolve(process.cwd(), 'server', 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
+const TMP_DB_FILE = path.join('/tmp', 'sih_db.json');
 
 interface DatabaseSchema {
   taxonomies: Record<string, RoleTaxonomyRecord>;
@@ -26,6 +27,7 @@ interface DatabaseSchema {
   opportunities: Record<string, JobOpportunityRecord>; // keyed by opportunityId
   llmLogs: LLMLogRecord[];
   roadmapProgress: Record<string, UserRoadmapProgress>;
+  interviews?: Record<string, any>;
 }
 
 export class Database {
@@ -39,7 +41,8 @@ export class Database {
     serverResumes: {},
     opportunities: {},
     llmLogs: [],
-    roadmapProgress: {}
+    roadmapProgress: {},
+    interviews: {}
   };
   private isLoaded = false;
 
@@ -57,12 +60,19 @@ export class Database {
   private init() {
     if (this.isLoaded) return;
     try {
-      if (!fs.existsSync(DB_DIR)) {
-        fs.mkdirSync(DB_DIR, { recursive: true });
+      let raw: string | null = null;
+      if (fs.existsSync(TMP_DB_FILE)) {
+        try {
+          raw = fs.readFileSync(TMP_DB_FILE, 'utf-8');
+        } catch {}
+      }
+      if (!raw && fs.existsSync(DB_FILE)) {
+        try {
+          raw = fs.readFileSync(DB_FILE, 'utf-8');
+        } catch {}
       }
 
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      if (raw) {
         this.data = JSON.parse(raw);
       } else {
         this.data = {
@@ -74,7 +84,8 @@ export class Database {
           serverResumes: {},
           opportunities: {},
           llmLogs: [],
-          roadmapProgress: {}
+          roadmapProgress: {},
+          interviews: {}
         };
       }
     } catch (err) {
@@ -104,7 +115,7 @@ export class Database {
       }
     }
 
-    if (hasNewData || !fs.existsSync(DB_FILE)) {
+    if (hasNewData || (!fs.existsSync(DB_FILE) && !fs.existsSync(TMP_DB_FILE))) {
       this.save();
     }
 
@@ -113,6 +124,15 @@ export class Database {
   }
 
   private save() {
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      try {
+        fs.writeFileSync(TMP_DB_FILE, JSON.stringify(this.data, null, 2), 'utf-8');
+      } catch (err) {
+        console.warn('[DB] Operating in in-memory mode:', err);
+      }
+      return;
+    }
+
     try {
       if (!fs.existsSync(DB_DIR)) {
         fs.mkdirSync(DB_DIR, { recursive: true });
@@ -122,8 +142,7 @@ export class Database {
       fs.renameSync(tmpFile, DB_FILE);
     } catch (err) {
       try {
-        const fallbackPath = path.join('/tmp', 'sih_db.json');
-        fs.writeFileSync(fallbackPath, JSON.stringify(this.data, null, 2), 'utf-8');
+        fs.writeFileSync(TMP_DB_FILE, JSON.stringify(this.data, null, 2), 'utf-8');
       } catch {
         console.warn('[DB] Operating in in-memory mode for this request cycle');
       }

@@ -31,7 +31,9 @@ export class OCRService {
 
     let worker: any = null;
     try {
-      worker = await createWorker('eng');
+      worker = await createWorker('eng', 1, {
+        cachePath: process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME ? '/tmp' : undefined
+      });
       if (onProgress) onProgress(35, 'Running OCR on document...');
 
       const ret = await worker.recognize(imageBuffer);

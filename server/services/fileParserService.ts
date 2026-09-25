@@ -5,15 +5,12 @@
 
 import crypto from 'crypto';
 import zlib from 'zlib';
-import { createRequire } from 'module';
 import mammoth from 'mammoth';
+import { PDFParse } from 'pdf-parse';
 import { ParsedResumeDocument } from '../types';
 import { Database } from '../db/database';
 import { OCRService } from './ocrService';
 import { SectionDetector } from './sectionDetector';
-
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 const MIN_WORDS_REQUIRED = 15;
@@ -249,9 +246,11 @@ export class FileParserService {
       // ── PDF ─────────────────────────────────────────────────────────────
       else if (detectedType === 'pdf') {
         if (onStatusUpdate) onStatusUpdate('Extracting PDF text...');
+        let parser: any = null;
         try {
-          const pdfData = await pdfParse(buffer);
-          rawText = pdfData.text || '';
+          parser = new PDFParse({ data: buffer });
+          const pdfData = await parser.getText();
+          rawText = pdfData?.text || '';
           extractionMethod = 'pdf-parse';
         } catch (pdfErr: any) {
           const errMsg = (pdfErr?.message || '').toLowerCase();
@@ -260,6 +259,10 @@ export class FileParserService {
           }
           console.warn('[Parser] Standard PDF extraction failed, attempting OCR fallback:', pdfErr);
           rawText = '';
+        } finally {
+          if (parser && typeof parser.destroy === 'function') {
+            try { await parser.destroy(); } catch {}
+          }
         }
 
         // Quality check: Check if PDF is scanned, empty, or garbled

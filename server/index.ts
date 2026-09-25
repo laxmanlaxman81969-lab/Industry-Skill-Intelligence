@@ -44,8 +44,12 @@ app.use(
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-// Request logging middleware
+// Request logging and Vercel path normalization middleware
 app.use((req, _res, next) => {
+  const matched = (req.headers['x-matched-path'] || req.headers['x-rewrite-url'] || req.headers['x-original-url']) as string | undefined;
+  if (matched && (req.url === '/api' || req.url === '/api/') && matched !== '/api') {
+    req.url = matched;
+  }
   console.log(`[HTTP] ${req.method} ${req.url}`);
   next();
 });

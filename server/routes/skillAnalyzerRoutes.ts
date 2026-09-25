@@ -214,6 +214,7 @@ const handleUpload = (req: Request, res: Response) => {
         ocrUsed: parseResult.document.ocrUsed,
         ocrConfidence: parseResult.document.ocrConfidence,
         detectedSections: parseResult.document.detectedSections,
+        extractedText: parseResult.document.extractedText,
         extractedTextPreview: parseResult.document.extractedText.slice(0, 500)
       });
     } catch (parseErr: any) {
@@ -441,6 +442,31 @@ skillAnalyzerRouter.post('/analyze', async (req: Request, res: Response) => {
     } = req.body;
 
     let parsedDoc = fileHash ? db.getCachedParse(fileHash) : null;
+
+    // Serverless multi-instance fallback: reconstruct parsedDoc from client-provided extractedText
+    if (!parsedDoc && (req.body.extractedText || req.body.rawText)) {
+      const text = (req.body.extractedText || req.body.rawText || '').trim();
+      if (text) {
+        parsedDoc = {
+          fileHash: fileHash || crypto.createHash('sha256').update(text).digest('hex'),
+          fileName: fileName || 'Resume.pdf',
+          fileSize: req.body.fileSize || text.length,
+          fileMimeType: req.body.fileMimeType || 'application/pdf',
+          extractedText: text,
+          wordCount: text.split(/\s+/).filter(Boolean).length,
+          extractionMethod: req.body.extractionMethod || 'text-direct',
+          ocrUsed: !!req.body.ocrUsed,
+          ocrConfidence: req.body.ocrConfidence,
+          sourceType: 'file',
+          extractionQuality: req.body.extractionQuality || 'High',
+          detectedSections: req.body.detectedSections || {},
+          detectedLanguage: 'English',
+          isLanguageSupported: true,
+          parsedAt: new Date().toISOString()
+        };
+        db.saveParsedDocument(parsedDoc);
+      }
+    }
 
     // Handle direct text paste if provided
     if (!parsedDoc && customText && customText.trim()) {

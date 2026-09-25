@@ -30,6 +30,7 @@ export interface UploadResponse {
   extractionMethod?: string;
   extractionQuality?: 'High' | 'Medium' | 'Low';
   detectedSections?: Record<string, string | undefined>;
+  extractedText?: string;
   extractedTextPreview: string;
   error?: string;
 }
@@ -410,6 +411,14 @@ export class SkillAnalyzerApi {
     opportunityRequiredSkills?: string[];
     opportunityPreferredSkills?: string[];
     opportunityDescription?: string;
+    extractedText?: string;
+    detectedSections?: Record<string, string | undefined>;
+    fileSize?: number;
+    fileMimeType?: string;
+    extractionMethod?: string;
+    ocrUsed?: boolean;
+    ocrConfidence?: number;
+    extractionQuality?: 'High' | 'Medium' | 'Low';
   }): Promise<AnalyzeResponse> {
     let res: Response;
     try {

@@ -70,6 +70,9 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
     isUrl?: boolean;
     url?: string;
     extractionMethod?: string;
+    extractedText?: string;
+    detectedSections?: Record<string, string | undefined>;
+    rawSize?: number;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -215,6 +218,9 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
         isImage: isImg,
         isUrl: false,
         extractionMethod: res.extractionMethod,
+        extractedText: res.extractedText,
+        detectedSections: res.detectedSections,
+        rawSize: file.size,
       });
       setSelectedResumeId(null);
       if (res.ocrUsed) {
@@ -311,6 +317,9 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
           roleId,
           userId: studentProfile.email || 'default_user',
           fileName: uploadedFile?.name || selectedStoredResume?.fileName || 'Resume.pdf',
+          extractedText: uploadedFile?.extractedText,
+          detectedSections: uploadedFile?.detectedSections,
+          fileSize: uploadedFile?.rawSize,
           opportunityId: opp?.id,
           opportunityTitle: opp?.title,
           opportunityCompany: opp?.companyName || (opp as any)?.company,
