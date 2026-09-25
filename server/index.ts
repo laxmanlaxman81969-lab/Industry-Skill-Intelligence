@@ -98,15 +98,4 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-// Start listening if run directly (skip when imported as a Vercel serverless function or in test)
-if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🚀 Skill Intelligence Backend API running on port ${PORT}`);
-    console.log(`👉 Health: http://localhost:${PORT}/api/health`);
-    console.log(`👉 Skill Analyzer: http://localhost:${PORT}/api/skill-analyzer/status`);
-    console.log(`=======================================================`);
-  });
-}
-
 export default app;

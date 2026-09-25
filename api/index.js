@@ -1,10 +1,3 @@
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined") return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
-
 // server/index.ts
 import express from "express";
 import cors from "cors";
@@ -1133,7 +1126,6 @@ import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
 
 // server/services/ocrService.ts
-import { createWorker } from "tesseract.js";
 var OCRService = class _OCRService {
   static instance;
   static getInstance() {
@@ -1151,6 +1143,7 @@ var OCRService = class _OCRService {
     if (onProgress) onProgress(10, "Initializing OCR engine...");
     let worker = null;
     try {
+      const { createWorker } = await import("tesseract.js");
       worker = await createWorker("eng", 1, {
         cachePath: process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME ? "/tmp" : void 0
       });
@@ -3640,53 +3633,6 @@ var DSA_TOPIC_LESSONS = {};
 var MYSQL_TOPIC_LESSONS = {};
 var MONGODB_TOPIC_LESSONS = {};
 var EXPRESSJS_TOPIC_LESSONS = {};
-if (typeof __require !== "undefined") {
-  try {
-    ({ JAVA_TOPIC_LESSONS } = __require("./javaLessonContent"));
-  } catch {
-  }
-  try {
-    ({ JAVA_ADVANCED_TOPIC_LESSONS } = __require("./javaAdvancedLessonContent"));
-  } catch {
-  }
-  try {
-    ({ PYTHON_TOPIC_LESSONS } = __require("./pythonLessonContent"));
-  } catch {
-  }
-  try {
-    ({ JAVASCRIPT_TOPIC_LESSONS } = __require("./javascriptLessonContent"));
-  } catch {
-  }
-  try {
-    ({ SQL_TOPIC_LESSONS } = __require("./sqlLessonContent"));
-  } catch {
-  }
-  try {
-    ({ HTML_TOPIC_LESSONS, CSS_TOPIC_LESSONS } = __require("./htmlCssLessonContent"));
-  } catch {
-  }
-  try {
-    ({ REACT_TOPIC_LESSONS } = __require("./reactLessonContent"));
-  } catch {
-  }
-  try {
-    ({ SPRING_BOOT_TOPIC_LESSONS } = __require("./springBootLessonContent"));
-  } catch {
-  }
-  try {
-    const otherTech = __require("./otherTechLessonContent");
-    TYPESCRIPT_TOPIC_LESSONS = otherTech.TYPESCRIPT_TOPIC_LESSONS || {};
-    NODEJS_TOPIC_LESSONS = otherTech.NODEJS_TOPIC_LESSONS || {};
-    DOCKER_TOPIC_LESSONS = otherTech.DOCKER_TOPIC_LESSONS || {};
-    GIT_TOPIC_LESSONS = otherTech.GIT_TOPIC_LESSONS || {};
-    GITHUB_TOPIC_LESSONS = otherTech.GITHUB_TOPIC_LESSONS || {};
-    DSA_TOPIC_LESSONS = otherTech.DSA_TOPIC_LESSONS || {};
-    MYSQL_TOPIC_LESSONS = otherTech.MYSQL_TOPIC_LESSONS || {};
-    MONGODB_TOPIC_LESSONS = otherTech.MONGODB_TOPIC_LESSONS || {};
-    EXPRESSJS_TOPIC_LESSONS = otherTech.EXPRESSJS_TOPIC_LESSONS || {};
-  } catch {
-  }
-}
 var ALL_TOPIC_LESSONS = {
   java: { ...JAVA_TOPIC_LESSONS, ...JAVA_ADVANCED_TOPIC_LESSONS },
   python: PYTHON_TOPIC_LESSONS,
@@ -7629,25 +7575,10 @@ app.use((err, _req, res, _next) => {
     error: err.message || "Internal Server Error"
   });
 });
-if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`\u{1F680} Skill Intelligence Backend API running on port ${PORT}`);
-    console.log(`\u{1F449} Health: http://localhost:${PORT}/api/health`);
-    console.log(`\u{1F449} Skill Analyzer: http://localhost:${PORT}/api/skill-analyzer/status`);
-    console.log(`=======================================================`);
-  });
-}
 var index_default = app;
 
 // server/apiEntry.ts
-var config = {
-  api: {
-    bodyParser: false
-  }
-};
 var apiEntry_default = index_default;
 export {
-  config,
   apiEntry_default as default
 };

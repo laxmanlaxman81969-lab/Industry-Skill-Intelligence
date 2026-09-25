@@ -1,8 +1,6 @@
 // Real OCR Service using Tesseract.js
 // Invoked for image resumes (PNG, JPG, JPEG, WEBP) and scanned PDFs (< 40 words or garbled)
 
-import { createWorker } from 'tesseract.js';
-
 export interface OCRResult {
   text: string;
   confidence: number; // 0.0 to 1.0
@@ -31,6 +29,7 @@ export class OCRService {
 
     let worker: any = null;
     try {
+      const { createWorker } = await import('tesseract.js');
       worker = await createWorker('eng', 1, {
         cachePath: process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME ? '/tmp' : undefined
       });
