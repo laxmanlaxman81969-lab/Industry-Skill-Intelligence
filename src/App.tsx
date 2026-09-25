@@ -16,11 +16,13 @@ function AppContent() {
   const { currentUser, studentProfile, logout } = useApp();
 
   const [activeView, setActiveView] = useState<string>(() => {
-    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
-      return 'login';
-    }
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/roadmap')) {
-      return 'roadmap';
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path === '/login') return 'login';
+      if (path.startsWith('/roadmap')) return 'roadmap';
+      if (path === '/ai-skill-analyzer' || path.startsWith('/ai-skill-analyzer')) return 'gap-analyzer';
+      if (path === '/opportunities') return 'opportunities';
+      if (path === '/resume-data') return 'resume-data';
     }
     const session = AuthService.getInstance().getCurrentSession();
     if (session?.user) {
@@ -43,8 +45,21 @@ function AppContent() {
       const path = window.location.pathname;
       if (path === '/login') {
         setActiveView('login');
+      } else if (path === '/ai-skill-analyzer' || path.startsWith('/ai-skill-analyzer')) {
+        setActiveView('gap-analyzer');
+      } else if (path === '/opportunities') {
+        setActiveView('opportunities');
+      } else if (path === '/resume-data') {
+        setActiveView('resume-data');
+      } else if (path.startsWith('/roadmap')) {
+        setActiveView('roadmap');
       } else if (path === '/' || path === '') {
-        setActiveView('landing');
+        const session = AuthService.getInstance().getCurrentSession();
+        if (session?.user?.role === 'student') {
+          setActiveView('student-dashboard');
+        } else {
+          setActiveView('landing');
+        }
       }
     };
     window.addEventListener('popstate', handlePopState);

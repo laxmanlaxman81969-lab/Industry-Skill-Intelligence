@@ -13,7 +13,8 @@ import {
   ArrowRight,
   Send,
   Filter,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -26,6 +27,7 @@ export const OpportunityRadar: React.FC<OpportunityRadarProps> = ({ onNavigate }
   const [filterType, setFilterType] = useState<string>('All');
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [openingOppId, setOpeningOppId] = useState<string | null>(null);
 
   const studentSkillNames = studentProfile?.skills?.map((s) => s.name.toLowerCase()) || [];
 
@@ -64,13 +66,23 @@ export const OpportunityRadar: React.FC<OpportunityRadarProps> = ({ onNavigate }
   };
 
   const handleAnalyzeOpportunity = (job: JobRequirement) => {
+    if (!job || !job.id) return;
+    setOpeningOppId(job.id);
     setSelectedOpportunityContext(job);
-    if (onNavigate) {
-      onNavigate('gap-analyzer');
-      return;
-    }
-    window.history.pushState({ view: 'gap-analyzer' }, '', '/');
-    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    const targetUrl = `/ai-skill-analyzer?opportunityId=${encodeURIComponent(job.id)}`;
+    try {
+      window.history.pushState({ view: 'gap-analyzer', opportunityId: job.id }, '', targetUrl);
+    } catch {}
+
+    setTimeout(() => {
+      if (onNavigate) {
+        onNavigate('gap-analyzer');
+      } else {
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+      setOpeningOppId(null);
+    }, 260);
   };
 
   return (
@@ -237,10 +249,20 @@ export const OpportunityRadar: React.FC<OpportunityRadarProps> = ({ onNavigate }
                         )}
                         <button
                           onClick={() => handleAnalyzeOpportunity(job)}
-                          className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-800 font-semibold text-xs hover:bg-slate-200 transition-all border border-slate-200 cursor-pointer"
+                          disabled={openingOppId === job.id}
+                          className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 disabled:opacity-75 transition-all shadow-xs cursor-pointer"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                          <span>{existingAnalysisId ? 'Re-analyze with AI' : 'Analyze with AI Skill Analyzer'}</span>
+                          {openingOppId === job.id ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Opening AI Analyzer...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-3.5 h-3.5 text-blue-100" />
+                              <span>{existingAnalysisId ? 'Re-analyze with AI' : 'Analyze with AI'}</span>
+                            </>
+                          )}
                         </button>
                       </>
                     );

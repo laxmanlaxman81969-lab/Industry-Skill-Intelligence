@@ -92,24 +92,89 @@ const getApiBaseUrl = (): string => {
   }
 };
 
-const safeParseJson = async (res: Response): Promise<any | null> => {
+export interface ParsedApiResponse<T = any> {
+  data: T | null;
+  isJson: boolean;
+  status: number;
+  statusText: string;
+  error?: string;
+}
+
+const safeParseJson = async <T = any>(res: Response): Promise<ParsedApiResponse<T>> => {
   const ct = res.headers.get('Content-Type') || '';
-  if (!ct.includes('application/json') && !ct.includes('text/json')) {
-    return null;
-  }
-  const text = await res.text();
-  if (!text || !text.trim()) return null;
+  const isJson = ct.includes('application/json') || ct.includes('text/json');
+  let rawText = '';
   try {
-    return JSON.parse(text);
+    rawText = await res.text();
   } catch {
-    return null;
+    rawText = '';
   }
+
+  if (!isJson) {
+    return {
+      data: null,
+      isJson: false,
+      status: res.status,
+      statusText: res.statusText,
+      error: `Server returned non-JSON content (${ct || 'unknown'}). Status: ${res.status}`
+    };
+  }
+
+  if (!rawText || !rawText.trim()) {
+    return {
+      data: null,
+      isJson: false,
+      status: res.status,
+      statusText: res.statusText,
+      error: `Server returned empty response. Status: ${res.status}`
+    };
+  }
+
+  try {
+    const parsed = JSON.parse(rawText);
+    return {
+      data: parsed as T,
+      isJson: true,
+      status: res.status,
+      statusText: res.statusText
+    };
+  } catch {
+    return {
+      data: null,
+      isJson: false,
+      status: res.status,
+      statusText: res.statusText,
+      error: `Failed to parse JSON response. Status: ${res.status}`
+    };
+  }
+};
+
+const handleApiError = (parsed: ParsedApiResponse, defaultMsg: string): never => {
+  if (parsed.status === 404) {
+    throw new Error(`Resume service endpoint not found (HTTP 404). Check API configuration.`);
+  }
+  if (parsed.status === 401 || parsed.status === 403) {
+    throw new Error('Your session has expired. Please sign in again.');
+  }
+  if (parsed.status === 413) {
+    throw new Error('File exceeds upload limit (HTTP 413). Please upload a smaller file under 10 MB.');
+  }
+  if (parsed.status === 415) {
+    throw new Error('Unsupported document format (HTTP 415). Please upload PDF, DOCX, DOC, TXT, RTF, ODT, HTML, or an image resume.');
+  }
+  if (parsed.data && typeof parsed.data === 'object' && (parsed.data as any).error) {
+    throw new Error((parsed.data as any).error);
+  }
+  if (!parsed.isJson) {
+    throw new Error(`Unexpected server response (HTTP ${parsed.status} ${parsed.statusText}).`);
+  }
+  throw new Error(defaultMsg);
 };
 
 const fetchWithTimeout = async (
   url: string,
   options: RequestInit = {},
-  timeoutMs = 30000
+  timeoutMs = 45000
 ): Promise<Response> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -181,14 +246,30 @@ export class SkillAnalyzerApi {
   }
 
   /**
-   * Health check to verify backend reachability.
+   * Diagnostic health check to verify backend reachability.
+   */
+  public static async checkHealth(): Promise<{ status: string; service: string; timestamp?: string }> {
+    try {
+      const res = await fetchWithTimeout(`${getApiBaseUrl()}/api/health`, {}, 5000);
+      const parsed = await safeParseJson(res);
+      if (parsed.isJson && parsed.data && parsed.data.status === 'ok') {
+        return parsed.data;
+      }
+      throw new Error(`Health check returned status ${res.status}`);
+    } catch (err: any) {
+      throw new Error('Resume processing service is unavailable.');
+    }
+  }
+
+  /**
+   * Health check to verify backend reachability and configuration.
    */
   public static async getStatus(): Promise<StatusResponse> {
     try {
       const res = await fetchWithTimeout(`${this.baseUrl}/status`, {}, 4000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && 'success' in data) {
-        return data as StatusResponse;
+      const parsed = await safeParseJson<StatusResponse>(res);
+      if (parsed.isJson && parsed.data && 'success' in parsed.data) {
+        return parsed.data;
       }
     } catch {}
     return {
@@ -205,9 +286,9 @@ export class SkillAnalyzerApi {
   public static async getRoles(): Promise<RolesResponse> {
     try {
       const res = await fetchWithTimeout(`${this.baseUrl}/roles`, {}, 5000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && data.success && Array.isArray(data.roles)) {
-        return data as RolesResponse;
+      const parsed = await safeParseJson<RolesResponse>(res);
+      if (parsed.isJson && parsed.data && parsed.data.success && Array.isArray(parsed.data.roles)) {
+        return parsed.data;
       }
     } catch {}
     return { success: true, roles: DEFAULT_ROLES };
@@ -221,9 +302,9 @@ export class SkillAnalyzerApi {
   ): Promise<{ success: boolean; taxonomy: RoleTaxonomyRecord }> {
     try {
       const res = await fetchWithTimeout(`${this.baseUrl}/taxonomy/${encodeURIComponent(roleId)}`, {}, 5000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && data.success && data.taxonomy) {
-        return data;
+      const parsed = await safeParseJson<{ success: boolean; taxonomy: RoleTaxonomyRecord }>(res);
+      if (parsed.isJson && parsed.data && parsed.data.success && parsed.data.taxonomy) {
+        return parsed.data;
       }
     } catch {}
 
@@ -253,9 +334,9 @@ export class SkillAnalyzerApi {
   }> {
     try {
       const res = await fetchWithTimeout(`${this.baseUrl}/opportunities`, {}, 5000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && data.success) {
-        return data;
+      const parsed = await safeParseJson<{ success: boolean; opportunities: JobOpportunityRecord[] }>(res);
+      if (parsed.isJson && parsed.data && parsed.data.success) {
+        return parsed.data;
       }
     } catch {}
     return { success: false, opportunities: [] };
@@ -265,8 +346,8 @@ export class SkillAnalyzerApi {
     id: string
   ): Promise<{ success: boolean; opportunity: JobOpportunityRecord }> {
     const res = await fetchWithTimeout(`${this.baseUrl}/opportunities/${encodeURIComponent(id)}`, {}, 5000);
-    const data = await safeParseJson(res);
-    if (data && typeof data === 'object' && data.success) return data;
+    const parsed = await safeParseJson<{ success: boolean; opportunity: JobOpportunityRecord }>(res);
+    if (parsed.isJson && parsed.data && parsed.data.success) return parsed.data;
     throw new Error('Opportunity not found.');
   }
 
@@ -298,19 +379,19 @@ export class SkillAnalyzerApi {
       }, 45000); // 45s for heavy OCR scans
     } catch (netErr: any) {
       console.error('[API: uploadResume] Network error:', netErr);
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+      throw new Error('Resume processing service is unavailable.');
     }
 
-    const data = await safeParseJson(res);
-    if (!data || typeof data !== 'object') {
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+    const parsed = await safeParseJson<UploadResponse>(res);
+    if (!parsed.isJson || !parsed.data) {
+      return handleApiError(parsed, 'Resume processing service is unavailable.');
     }
 
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'File parsing failed. Please check the document format.');
+    if (!res.ok || !parsed.data.success) {
+      throw new Error(parsed.data.error || parsed.data.message || 'File parsing failed. Please check the document format.');
     }
 
-    return data as UploadResponse;
+    return parsed.data;
   }
 
   /**
@@ -343,19 +424,19 @@ export class SkillAnalyzerApi {
       );
     } catch (netErr: any) {
       console.error('[API: analyzeResume] Network error:', netErr);
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+      throw new Error('Resume processing service is unavailable.');
     }
 
-    const data = await safeParseJson(res);
-    if (!data || typeof data !== 'object') {
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+    const parsed = await safeParseJson<AnalyzeResponse>(res);
+    if (!parsed.isJson || !parsed.data) {
+      return handleApiError(parsed, 'Resume processing service is unavailable.');
     }
 
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "Couldn't confidently analyze this resume. Please try again.");
+    if (!res.ok || !parsed.data.success) {
+      throw new Error(parsed.data.error || "Couldn't confidently analyze this resume. Please try again.");
     }
 
-    return data as AnalyzeResponse;
+    return parsed.data;
   }
 
   /**
@@ -391,19 +472,19 @@ export class SkillAnalyzerApi {
       );
     } catch (netErr: any) {
       console.error('[API: analyzeUrl] Network error:', netErr);
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+      throw new Error('Resume processing service is unavailable.');
     }
 
-    const data = await safeParseJson(res);
-    if (!data || typeof data !== 'object') {
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+    const parsed = await safeParseJson<AnalyzeResponse>(res);
+    if (!parsed.isJson || !parsed.data) {
+      return handleApiError(parsed, 'Resume processing service is unavailable.');
     }
 
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Unable to access or parse this resume URL.');
+    if (!res.ok || !parsed.data.success) {
+      throw new Error(parsed.data.error || 'Unable to access or parse this resume URL.');
     }
 
-    return data as AnalyzeResponse;
+    return parsed.data;
   }
 
   /**
@@ -425,20 +506,20 @@ export class SkillAnalyzerApi {
         },
         20000
       );
-    } catch (netErr: any) {
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+    } catch {
+      throw new Error('Resume processing service is unavailable.');
     }
 
-    const data = await safeParseJson(res);
-    if (!data || typeof data !== 'object') {
-      throw new Error('Resume processing service is temporarily unavailable. Please try again.');
+    const parsed = await safeParseJson<AnalyzeResponse>(res);
+    if (!parsed.isJson || !parsed.data) {
+      return handleApiError(parsed, 'Resume processing service is unavailable.');
     }
 
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to switch target role.');
+    if (!res.ok || !parsed.data.success) {
+      throw new Error(parsed.data.error || 'Failed to switch target role.');
     }
 
-    return data as AnalyzeResponse;
+    return parsed.data;
   }
 
   public static async getAnalysisHistory(
@@ -449,8 +530,8 @@ export class SkillAnalyzerApi {
       : `${this.baseUrl}/history`;
     try {
       const res = await fetchWithTimeout(url, {}, 8000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && data.success) return data;
+      const parsed = await safeParseJson<{ success: boolean; history: AnalysisRecord[]; count: number }>(res);
+      if (parsed.isJson && parsed.data && parsed.data.success) return parsed.data;
     } catch {}
     return { success: false, history: [], count: 0 };
   }
@@ -459,9 +540,9 @@ export class SkillAnalyzerApi {
     analysisId: string
   ): Promise<{ success: boolean; analysis: AnalysisRecord }> {
     const res = await fetchWithTimeout(`${this.baseUrl}/analysis/${encodeURIComponent(analysisId)}`, {}, 8000);
-    const data = await safeParseJson(res);
-    if (data && typeof data === 'object' && data.success && data.analysis) {
-      return data;
+    const parsed = await safeParseJson<{ success: boolean; analysis: AnalysisRecord }>(res);
+    if (parsed.isJson && parsed.data && parsed.data.success && parsed.data.analysis) {
+      return parsed.data;
     }
     throw new Error('Failed to load the saved analysis.');
   }
@@ -472,8 +553,8 @@ export class SkillAnalyzerApi {
         ? `${this.baseUrl}/resumes?userId=${encodeURIComponent(userId)}`
         : `${this.baseUrl}/resumes`;
       const res = await fetchWithTimeout(url, {}, 8000);
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object' && data.success) return data;
+      const parsed = await safeParseJson<ResumesResponse>(res);
+      if (parsed.isJson && parsed.data && parsed.data.success) return parsed.data;
     } catch {}
     return { success: false, resumes: [], count: 0 };
   }
@@ -486,8 +567,8 @@ export class SkillAnalyzerApi {
       ? `${this.baseUrl}/resume/${encodeURIComponent(fileHash)}?userId=${encodeURIComponent(userId)}`
       : `${this.baseUrl}/resume/${encodeURIComponent(fileHash)}`;
     const res = await fetchWithTimeout(url, {}, 8000);
-    const data = await safeParseJson(res);
-    if (data && typeof data === 'object' && data.success && data.resume) return data;
+    const parsed = await safeParseJson<ResumeDetailResponse>(res);
+    if (parsed.isJson && parsed.data && parsed.data.success && parsed.data.resume) return parsed.data;
     throw new Error('Failed to load resume detail.');
   }
 
@@ -495,8 +576,8 @@ export class SkillAnalyzerApi {
     fileHash: string
   ): Promise<{ success: boolean; analyses: AnalysisRecord[]; count: number }> {
     const res = await fetchWithTimeout(`${this.baseUrl}/resume/${encodeURIComponent(fileHash)}/analyses`, {}, 8000);
-    const data = await safeParseJson(res);
-    if (data && typeof data === 'object' && data.success) return data;
+    const parsed = await safeParseJson<{ success: boolean; analyses: AnalysisRecord[]; count: number }>(res);
+    if (parsed.isJson && parsed.data && parsed.data.success) return parsed.data;
     return { success: false, analyses: [], count: 0 };
   }
 
@@ -509,10 +590,10 @@ export class SkillAnalyzerApi {
         { method: 'DELETE' },
         8000
       );
-      const data = await safeParseJson(res);
-      if (data && typeof data === 'object') {
-        if (!data.success) throw new Error(data.error || 'Failed to delete resume.');
-        return data;
+      const parsed = await safeParseJson<{ success: boolean; message?: string; error?: string }>(res);
+      if (parsed.isJson && parsed.data) {
+        if (!parsed.data.success) throw new Error(parsed.data.error || 'Failed to delete resume.');
+        return parsed.data;
       }
     } catch (err: any) {
       throw err;

@@ -124,7 +124,7 @@ class PortalErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBound
 }
 
 export const StudentPortal: React.FC<StudentPortalProps> = ({ activeView, setActiveView, onLogout }) => {
-  const { currentUser, studentProfile, assignments } = useApp();
+  const { currentUser, studentProfile, assignments, selectedOpportunityContext } = useApp();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -134,8 +134,22 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ activeView, setAct
     setActiveView(view);
     setMobileSidebarOpen(false);
     const analysisId = view.startsWith('resume-analysis:') ? view.split(':')[1] : null;
-    const path = analysisId ? `/ai-skill-analyzer/result/${encodeURIComponent(analysisId)}` : '/';
-    window.history.pushState({ view }, '', path);
+    let path = '/';
+    if (analysisId) {
+      path = `/ai-skill-analyzer/result/${encodeURIComponent(analysisId)}`;
+    } else if (view === 'gap-analyzer') {
+      const oppId = selectedOpportunityContext?.id;
+      path = oppId ? `/ai-skill-analyzer?opportunityId=${encodeURIComponent(oppId)}` : '/ai-skill-analyzer';
+    } else if (view === 'opportunities') {
+      path = '/opportunities';
+    } else if (view === 'resume-data') {
+      path = '/resume-data';
+    } else if (view === 'roadmap') {
+      path = '/roadmap';
+    }
+    try {
+      window.history.pushState({ view }, '', path);
+    } catch {}
   };
 
   const pendingAssignments = assignments?.filter((a) => !a.completed).length || 0;

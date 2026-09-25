@@ -102,6 +102,47 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
     })();
   }, []);
 
+  // Pre-load opportunity if opportunityId is in URL query parameter
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const oppId = params.get('opportunityId');
+    if (oppId) {
+      const match = jobs.find(j => j.id === oppId);
+      if (match) {
+        setSelectedOpportunityContext(match);
+        if (match.role || match.title) setSelectedRole(match.role || match.title);
+      } else {
+        SkillAnalyzerApi.getOpportunity(oppId)
+          .then(res => {
+            if (res.success && res.opportunity) {
+              const opp = res.opportunity;
+              const converted = {
+                id: opp.id,
+                companyId: opp.id,
+                title: opp.title,
+                companyName: opp.companyName,
+                role: opp.role,
+                location: opp.location,
+                type: opp.type as any,
+                experience: opp.experience,
+                package: opp.package,
+                minReadinessScore: opp.minReadinessScore,
+                description: opp.description,
+                postedDate: opp.postedDate,
+                applicantsCount: opp.applicantsCount,
+                requiredSkills: opp.requiredSkills.map(s => ({ skill: s.skill, weight: s.weight, level: s.level as any })),
+                preferredSkills: opp.preferredSkills
+              };
+              setSelectedOpportunityContext(converted);
+              if (converted.role || converted.title) setSelectedRole(converted.role || converted.title);
+            }
+          })
+          .catch(() => {});
+      }
+    }
+  }, [jobs]);
+
   // Pre-populate file state from a stored resume
   useEffect(() => {
     if (!selectedStoredResume || uploadedFile) return;

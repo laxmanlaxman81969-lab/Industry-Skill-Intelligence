@@ -121,7 +121,12 @@ export class Database {
       fs.writeFileSync(tmpFile, JSON.stringify(this.data, null, 2), 'utf-8');
       fs.renameSync(tmpFile, DB_FILE);
     } catch (err) {
-      console.error('[DB] Failed to save database to disk:', err);
+      try {
+        const fallbackPath = path.join('/tmp', 'sih_db.json');
+        fs.writeFileSync(fallbackPath, JSON.stringify(this.data, null, 2), 'utf-8');
+      } catch {
+        console.warn('[DB] Operating in in-memory mode for this request cycle');
+      }
     }
   }
 

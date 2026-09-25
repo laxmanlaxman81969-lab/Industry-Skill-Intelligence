@@ -51,25 +51,25 @@ app.use((req, _res, next) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (_req, res) => {
+app.get(['/api/health', '/health'], (_req, res) => {
   res.json({
     status: 'ok',
-    service: 'Industry Skill Intelligence API',
+    service: 'industry-skill-intelligence-api',
     timestamp: new Date().toISOString()
   });
 });
 
-// Mount AI Skill Analyzer Routes
-app.use('/api/skill-analyzer', skillAnalyzerRouter);
-app.use('/api/resume', skillAnalyzerRouter);
-app.use('/api/roadmaps', roadmapRouter);
-app.use('/api/roadmap', roadmapRouter);
-app.use('/api/skills', (req, res, next) => {
+// Mount AI Skill Analyzer Routes (supporting both /api/* and /* prefixes for Vercel rewrites)
+app.use(['/api/skill-analyzer', '/skill-analyzer'], skillAnalyzerRouter);
+app.use(['/api/resume', '/resume'], skillAnalyzerRouter);
+app.use(['/api/roadmaps', '/roadmaps'], roadmapRouter);
+app.use(['/api/roadmap', '/roadmap'], roadmapRouter);
+app.use(['/api/skills', '/skills'], (req, res, next) => {
   req.url = '/skills' + (req.url === '/' ? '' : req.url);
   roadmapRouter(req, res, next);
 });
-app.use('/api/interview', interviewRouter);
-app.use('/api/industry-demand', demandRouter);
+app.use(['/api/interview', '/interview'], interviewRouter);
+app.use(['/api/industry-demand', '/industry-demand'], demandRouter);
 
 // Global Error Handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -80,8 +80,8 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-// Start listening if run directly
-if (process.env.NODE_ENV !== 'test') {
+// Start listening if run directly (skip when imported as a Vercel serverless function or in test)
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`=======================================================`);
     console.log(`🚀 Skill Intelligence Backend API running on port ${PORT}`);

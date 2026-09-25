@@ -3540,6 +3540,28 @@
       "detectedLanguage": "English",
       "isLanguageSupported": true,
       "parsedAt": "2026-09-24T12:31:56.677Z"
+    },
+    "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648": {
+      "fileHash": "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648",
+      "fileName": "Lakshman_Resume.txt",
+      "fileSize": 1592,
+      "fileMimeType": "text/plain",
+      "extractedText": "LAKSHMAN REDDY\nEmail: lakshman@example.com | Phone: +91 9876543210 | Bengaluru, India\nGitHub: github.com/lakshman | LinkedIn: linkedin.com/in/lakshman\n\nPROFESSIONAL SUMMARY\nBackend developer with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Docker containerization, Hibernate, and JUnit testing.\n\nTECHNICAL SKILLS\nLanguages: Java (Java 8/17), Python, SQL, JavaScript\nFrameworks & Libraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express\nDatabases: PostgreSQL, MySQL, Redis\nDevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux\n\nWORK EXPERIENCE\nJunior Java Developer - TechCorp Solutions (June 2024 - Present)\n- Developed and maintained RESTful APIs using Java 17 and Spring Boot microservices architecture.\n- Designed database schemas and optimized complex SQL queries in PostgreSQL, improving query response time by 30%.\n- Implemented JWT authentication and role-based access control with Spring Security.\n- Integrated Redis caching to reduce latency on high-throughput read operations.\n- Containerized Spring Boot applications with Docker and deployed via CI/CD pipelines.\n\nPROJECTS\nE-Commerce Microservices Platform\n- Architected a distributed e-commerce backend with Spring Boot, Spring Cloud, Kafka, and PostgreSQL.\n- Implemented inventory, order, and payment services with resilient fault tolerance using Resilience4j.\n- Wrote unit and integration tests using JUnit 5 and Mockito, achieving 85% test coverage.\n\nEDUCATION\nB.Tech in Computer Science and Engineering - 2024\nCGPA: 8.8 / 10.0",
+      "wordCount": 215,
+      "extractionMethod": "text-direct",
+      "ocrUsed": false,
+      "sourceType": "file",
+      "extractionQuality": "High",
+      "detectedSections": {
+        "summary": "Backend developer with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Docker containerization, Hibernate, and JUnit testing.",
+        "skills": "Languages: Java (Java 8/17), Python, SQL, JavaScript\nFrameworks & Libraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express\nDatabases: PostgreSQL, MySQL, Redis\nDevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux",
+        "experience": "Junior Java Developer - TechCorp Solutions (June 2024 - Present)\n- Developed and maintained RESTful APIs using Java 17 and Spring Boot microservices architecture.\n- Designed database schemas and optimized complex SQL queries in PostgreSQL, improving query response time by 30%.\n- Implemented JWT authentication and role-based access control with Spring Security.\n- Integrated Redis caching to reduce latency on high-throughput read operations.\n- Containerized Spring Boot applications with Docker and deployed via CI/CD pipelines.",
+        "projects": "E-Commerce Microservices Platform\n- Architected a distributed e-commerce backend with Spring Boot, Spring Cloud, Kafka, and PostgreSQL.\n- Implemented inventory, order, and payment services with resilient fault tolerance using Resilience4j.\n- Wrote unit and integration tests using JUnit 5 and Mockito, achieving 85% test coverage.",
+        "education": "B.Tech in Computer Science and Engineering - 2024\nCGPA: 8.8 / 10.0"
+      },
+      "detectedLanguage": "English",
+      "isLanguageSupported": true,
+      "parsedAt": "2026-09-25T05:00:38.381Z"
     }
   },
   "extractions": {
@@ -5153,6 +5175,249 @@
         "languages": []
       },
       "createdAt": "2026-09-24T12:31:59.514Z"
+    },
+    "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648": {
+      "fileHash": "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648",
+      "extraction": {
+        "extractionVersion": 2,
+        "candidateName": "LAKSHMAN REDDY",
+        "contactInfo": {
+          "email": "lakshman@example.com",
+          "phone": "+91 9876543210",
+          "location": ""
+        },
+        "summary": "Backend developer with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Docker containerization, Hibernate, and JUnit testing.",
+        "totalYearsExperience": 2,
+        "currentRole": "Developer - TechCorp Solutions",
+        "workHistory": [],
+        "education": [
+          {
+            "degree": "B.Tech in Computer Science and Engineering - 2024",
+            "institution": "CGPA: 8.8 / 10.0",
+            "year": "2024"
+          }
+        ],
+        "certifications": [],
+        "projects": [
+          {
+            "name": "E-Commerce Microservices Platform",
+            "description": "- Architected a distributed e-commerce backend with Spring Boot, Spring Cloud, Kafka, and PostgreSQL.",
+            "techStack": []
+          }
+        ],
+        "skillsClaimed": [
+          {
+            "skill": "Java",
+            "originalSkill": "Java",
+            "normalizedSkill": "Java",
+            "evidenceSnippet": "per with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring Boot",
+            "originalSkill": "Spring Boot",
+            "normalizedSkill": "Spring Boot",
+            "evidenceSnippet": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "REST API",
+            "originalSkill": "REST APIs",
+            "normalizedSkill": "REST API",
+            "evidenceSnippet": "f experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Exp",
+            "confidence": "inferred",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "SQL",
+            "originalSkill": "SQL",
+            "normalizedSkill": "SQL",
+            "evidenceSnippet": "oot, REST APIs, Microservices, and SQL database design. Experienced in Docker conta",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Microservices",
+            "originalSkill": "Microservices",
+            "normalizedSkill": "Microservices",
+            "evidenceSnippet": "e in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Doc",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Git",
+            "originalSkill": "Git",
+            "normalizedSkill": "Git",
+            "evidenceSnippet": "SQL, Redis DevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux WORK",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Docker",
+            "originalSkill": "Docker",
+            "normalizedSkill": "Docker",
+            "evidenceSnippet": "QL database design. Experienced in Docker containerization, Hibernate, and JUnit testi",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "CI/CD",
+            "originalSkill": "CI/CD",
+            "normalizedSkill": "CI/CD",
+            "evidenceSnippet": "tions with Docker and deployed via CI/CD pipelines. PROJECTS E-Commerce Microservice",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Python",
+            "originalSkill": "Python",
+            "normalizedSkill": "Python",
+            "evidenceSnippet": "KILLS Languages: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spr",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring",
+            "originalSkill": "Spring",
+            "normalizedSkill": "Spring",
+            "evidenceSnippet": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL data",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Hibernate",
+            "originalSkill": "Hibernate",
+            "normalizedSkill": "Hibernate",
+            "evidenceSnippet": "ienced in Docker containerization, Hibernate, and JUnit testing. TECHNICAL SKILLS Langua",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JPA",
+            "originalSkill": "JPA",
+            "normalizedSkill": "JPA",
+            "evidenceSnippet": "ibraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express Databas",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "MySQL",
+            "originalSkill": "MySQL",
+            "normalizedSkill": "MySQL",
+            "evidenceSnippet": "ty, Express Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, GitHub A",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "PostgreSQL",
+            "originalSkill": "PostgreSQL",
+            "normalizedSkill": "PostgreSQL",
+            "evidenceSnippet": "pring Security, Express Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, G",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Redis",
+            "originalSkill": "Redis",
+            "normalizedSkill": "Redis",
+            "evidenceSnippet": "ress Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, GitHub Actions,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "GitHub",
+            "originalSkill": "GitHub",
+            "normalizedSkill": "GitHub",
+            "evidenceSnippet": "+91 9876543210 | Bengaluru, India GitHub: github.com/lakshman | LinkedIn: linkedin.co",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Linux",
+            "originalSkill": "Linux",
+            "normalizedSkill": "Linux",
+            "evidenceSnippet": "t, GitHub Actions, Maven, Postman, Linux WORK EXPERIENCE Junior Java Developer - Tec",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JUnit",
+            "originalSkill": "JUnit",
+            "normalizedSkill": "JUnit",
+            "evidenceSnippet": "r containerization, Hibernate, and JUnit testing. TECHNICAL SKILLS Languages: Java (",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Mockito",
+            "originalSkill": "Mockito",
+            "normalizedSkill": "Mockito",
+            "evidenceSnippet": "ntegration tests using JUnit 5 and Mockito, achieving 85% test coverage. EDUCATION B.T",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JavaScript",
+            "originalSkill": "JavaScript",
+            "normalizedSkill": "JavaScript",
+            "evidenceSnippet": "es: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spring Boot, Spring",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Express.js",
+            "originalSkill": "Express",
+            "normalizedSkill": "Express.js",
+            "evidenceSnippet": "a JPA, Hibernate, Spring Security, Express Databases: PostgreSQL, MySQL, Redis DevOps &",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Kafka",
+            "originalSkill": "Kafka",
+            "normalizedSkill": "Kafka",
+            "evidenceSnippet": "nd with Spring Boot, Spring Cloud, Kafka, and PostgreSQL. - Implemented inventory, or",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Postman",
+            "originalSkill": "Postman",
+            "normalizedSkill": "Postman",
+            "evidenceSnippet": "ocker, Git, GitHub Actions, Maven, Postman, Linux WORK EXPERIENCE Junior Java Develope",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          }
+        ],
+        "achievements": [],
+        "languages": []
+      },
+      "createdAt": "2026-09-25T05:00:46.087Z"
     }
   },
   "analyses": {
@@ -12068,6 +12333,564 @@
         "Linux"
       ],
       "opportunityPartialSkills": []
+    },
+    "an-1790312446081-dc87c993": {
+      "analysisId": "an-1790312446081-dc87c993",
+      "userId": "test_student@example.com",
+      "fileHash": "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648",
+      "fileName": "Lakshman_Resume.txt",
+      "fileSize": 1592,
+      "roleId": "java-backend-developer",
+      "roleName": "Java Backend Developer",
+      "taxonomyVersion": "2026.3.1",
+      "benchmarkRefreshDate": "2026-03-01",
+      "status": "COMPLETED",
+      "confidenceRating": "High",
+      "confidenceExplanation": "High confidence analysis based on robust, multi-section resume evidence.",
+      "warnings": [
+        "Claude API key not configured in .env — using deterministic server extraction engine."
+      ],
+      "scoreBreakdown": {
+        "overallScore": 100,
+        "skillCoverage": 40,
+        "depthOfExperience": 16,
+        "practicalEvidence": 5,
+        "educationCertification": 10,
+        "calculationExplanation": {
+          "skillCoverageFormula": "(68 matched core weight / 68 total taxonomy core weight) × 40 = 40 / 40 pts",
+          "depthFormula": "Explicit evidence (9/10 pts) + Experience duration (7/10 pts) + Seniority signals (0/5 pts) = 16 / 25 pts",
+          "practicalFormula": "(2 practically verified in projects & work history / 8 total matched skills) × 20 = 5 / 20 pts",
+          "educationFormula": "Accredited degree relevance (10/10 pts) + Professional certifications (0/5 pts) = 10 / 15 pts"
+        }
+      },
+      "atsScore": {
+        "score": 82,
+        "status": "Strong ATS Pass",
+        "contactInfoScore": 9,
+        "structureScore": 10,
+        "sectionClarityScore": 10,
+        "skillsPresentationScore": 10,
+        "experienceClarityScore": 5,
+        "projectClarityScore": 10,
+        "educationScore": 8,
+        "formattingScore": 10,
+        "readabilityScore": 10,
+        "sectionsPassed": [
+          {
+            "name": "Contact & Header",
+            "passed": true
+          },
+          {
+            "name": "Technical Skills Section",
+            "passed": true
+          },
+          {
+            "name": "Projects / Work Experience",
+            "passed": true
+          },
+          {
+            "name": "Education & Credentials",
+            "passed": true
+          }
+        ],
+        "strengths": [
+          "Complete contact information with verified email and phone.",
+          "Explicit, well-organized technical skills section."
+        ],
+        "issues": [
+          "Add 1-2 detailed portfolio projects highlighting backend technologies."
+        ],
+        "parsingRisks": [],
+        "formattingRecommendations": []
+      },
+      "skillGapScore": {
+        "score": 100,
+        "status": "High Match",
+        "requiredSkillsTotal": 8,
+        "requiredSkillsMatched": 8,
+        "preferredSkillsTotal": 3,
+        "preferredSkillsMatched": 0,
+        "criticalMissingCount": 0,
+        "partialMatchesCount": 4,
+        "matchPercentage": 100,
+        "explanation": "8 of 8 required skills matched (4 partial). 0 critical skills missing."
+      },
+      "matchedSkills": [
+        {
+          "skill": "Java",
+          "normalizedSkill": "Java",
+          "taxonomyWeight": 10,
+          "confidence": "explicit",
+          "evidenceQuote": "per with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Language"
+        },
+        {
+          "skill": "Spring Boot",
+          "normalizedSkill": "Spring Boot",
+          "taxonomyWeight": 10,
+          "confidence": "explicit",
+          "evidenceQuote": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database",
+          "practicalEvidence": true,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "REST APIs",
+          "normalizedSkill": "REST APIs",
+          "taxonomyWeight": 9,
+          "confidence": "inferred",
+          "evidenceQuote": "f experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Exp",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "SQL",
+          "normalizedSkill": "SQL",
+          "taxonomyWeight": 9,
+          "confidence": "explicit",
+          "evidenceQuote": "oot, REST APIs, Microservices, and SQL database design. Experienced in Docker conta",
+          "practicalEvidence": true,
+          "sourceSection": "Technical Skills",
+          "category": "Database"
+        },
+        {
+          "skill": "JPA / Hibernate",
+          "normalizedSkill": "JPA / Hibernate",
+          "taxonomyWeight": 8,
+          "confidence": "explicit",
+          "evidenceQuote": "ibraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express Databas",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "Microservices",
+          "normalizedSkill": "Microservices",
+          "taxonomyWeight": 8,
+          "confidence": "explicit",
+          "evidenceQuote": "e in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Doc",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "Git",
+          "normalizedSkill": "Git",
+          "taxonomyWeight": 7,
+          "confidence": "explicit",
+          "evidenceQuote": "SQL, Redis DevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux WORK",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Tools"
+        },
+        {
+          "skill": "Backend Testing (JUnit/Mockito)",
+          "normalizedSkill": "Backend Testing (JUnit/Mockito)",
+          "taxonomyWeight": 7,
+          "confidence": "explicit",
+          "evidenceQuote": "r containerization, Hibernate, and JUnit testing. TECHNICAL SKILLS Languages: Java (",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Tools"
+        }
+      ],
+      "missingSkills": [],
+      "partialSkills": [
+        {
+          "skill": "Java",
+          "normalizedSkill": "Java",
+          "taxonomyWeight": 10,
+          "evidenceQuote": "per with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring Java.",
+          "category": "Language"
+        },
+        {
+          "skill": "REST APIs",
+          "normalizedSkill": "REST APIs",
+          "taxonomyWeight": 9,
+          "evidenceQuote": "f experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Exp",
+          "reason": "Skill inferred from context without explicit keyword declaration.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring REST APIs.",
+          "category": "Backend"
+        },
+        {
+          "skill": "JPA / Hibernate",
+          "normalizedSkill": "JPA / Hibernate",
+          "taxonomyWeight": 8,
+          "evidenceQuote": "ibraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express Databas",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring JPA / Hibernate.",
+          "category": "Backend"
+        },
+        {
+          "skill": "Microservices",
+          "normalizedSkill": "Microservices",
+          "taxonomyWeight": 8,
+          "evidenceQuote": "e in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Doc",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring Microservices.",
+          "category": "Backend"
+        }
+      ],
+      "uncertainSkills": [],
+      "irrelevantSkills": [
+        {
+          "skill": "CI/CD",
+          "evidenceQuote": "tions with Docker and deployed via CI/CD pipelines. PROJECTS E-Commerce Microservice",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Python",
+          "evidenceQuote": "KILLS Languages: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spr",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Spring",
+          "evidenceQuote": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL data",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Redis",
+          "evidenceQuote": "ress Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, GitHub Actions,",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Linux",
+          "evidenceQuote": "t, GitHub Actions, Maven, Postman, Linux WORK EXPERIENCE Junior Java Developer - Tec",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "JavaScript",
+          "evidenceQuote": "es: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spring Boot, Spring",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Express.js",
+          "evidenceQuote": "a JPA, Hibernate, Spring Security, Express Databases: PostgreSQL, MySQL, Redis DevOps &",
+          "confidence": "explicit"
+        }
+      ],
+      "whatToLearnNext": [
+        {
+          "skill": "Java",
+          "severity": "Important",
+          "priority": 1,
+          "roadmapSkill": "Java",
+          "actionDescription": "Strengthen Java: Implement a production-grade portfolio project featuring Java."
+        },
+        {
+          "skill": "REST APIs",
+          "severity": "Important",
+          "priority": 2,
+          "roadmapSkill": "REST APIs",
+          "actionDescription": "Strengthen REST APIs: Implement a production-grade portfolio project featuring REST APIs."
+        },
+        {
+          "skill": "JPA / Hibernate",
+          "severity": "Important",
+          "priority": 3,
+          "roadmapSkill": "JPA / Hibernate",
+          "actionDescription": "Strengthen JPA / Hibernate: Implement a production-grade portfolio project featuring JPA / Hibernate."
+        },
+        {
+          "skill": "Microservices",
+          "severity": "Important",
+          "priority": 4,
+          "roadmapSkill": "Microservices",
+          "actionDescription": "Strengthen Microservices: Implement a production-grade portfolio project featuring Microservices."
+        }
+      ],
+      "candidateName": "LAKSHMAN REDDY",
+      "extractionSummary": {
+        "totalYearsExperience": 2,
+        "educationSummary": "B.Tech in Computer Science and Engineering - 2024 from CGPA: 8.8 / 10.0",
+        "projectCount": 1,
+        "certificationsCount": 0,
+        "totalClaimedSkills": 23,
+        "verifiedSkillsCount": 23
+      },
+      "structuredExtraction": {
+        "extractionVersion": 2,
+        "candidateName": "LAKSHMAN REDDY",
+        "contactInfo": {
+          "email": "lakshman@example.com",
+          "phone": "+91 9876543210",
+          "location": ""
+        },
+        "summary": "Backend developer with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Docker containerization, Hibernate, and JUnit testing.",
+        "totalYearsExperience": 2,
+        "currentRole": "Developer - TechCorp Solutions",
+        "workHistory": [],
+        "education": [
+          {
+            "degree": "B.Tech in Computer Science and Engineering - 2024",
+            "institution": "CGPA: 8.8 / 10.0",
+            "year": "2024"
+          }
+        ],
+        "certifications": [],
+        "projects": [
+          {
+            "name": "E-Commerce Microservices Platform",
+            "description": "- Architected a distributed e-commerce backend with Spring Boot, Spring Cloud, Kafka, and PostgreSQL.",
+            "techStack": []
+          }
+        ],
+        "skillsClaimed": [
+          {
+            "skill": "Java",
+            "originalSkill": "Java",
+            "normalizedSkill": "Java",
+            "evidenceSnippet": "per with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring Boot",
+            "originalSkill": "Spring Boot",
+            "normalizedSkill": "Spring Boot",
+            "evidenceSnippet": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "REST API",
+            "originalSkill": "REST APIs",
+            "normalizedSkill": "REST API",
+            "evidenceSnippet": "f experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Exp",
+            "confidence": "inferred",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "SQL",
+            "originalSkill": "SQL",
+            "normalizedSkill": "SQL",
+            "evidenceSnippet": "oot, REST APIs, Microservices, and SQL database design. Experienced in Docker conta",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Microservices",
+            "originalSkill": "Microservices",
+            "normalizedSkill": "Microservices",
+            "evidenceSnippet": "e in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Doc",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Git",
+            "originalSkill": "Git",
+            "normalizedSkill": "Git",
+            "evidenceSnippet": "SQL, Redis DevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux WORK",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Docker",
+            "originalSkill": "Docker",
+            "normalizedSkill": "Docker",
+            "evidenceSnippet": "QL database design. Experienced in Docker containerization, Hibernate, and JUnit testi",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "CI/CD",
+            "originalSkill": "CI/CD",
+            "normalizedSkill": "CI/CD",
+            "evidenceSnippet": "tions with Docker and deployed via CI/CD pipelines. PROJECTS E-Commerce Microservice",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Python",
+            "originalSkill": "Python",
+            "normalizedSkill": "Python",
+            "evidenceSnippet": "KILLS Languages: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spr",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring",
+            "originalSkill": "Spring",
+            "normalizedSkill": "Spring",
+            "evidenceSnippet": "th 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL data",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Hibernate",
+            "originalSkill": "Hibernate",
+            "normalizedSkill": "Hibernate",
+            "evidenceSnippet": "ienced in Docker containerization, Hibernate, and JUnit testing. TECHNICAL SKILLS Langua",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JPA",
+            "originalSkill": "JPA",
+            "normalizedSkill": "JPA",
+            "evidenceSnippet": "ibraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express Databas",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "MySQL",
+            "originalSkill": "MySQL",
+            "normalizedSkill": "MySQL",
+            "evidenceSnippet": "ty, Express Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, GitHub A",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "PostgreSQL",
+            "originalSkill": "PostgreSQL",
+            "normalizedSkill": "PostgreSQL",
+            "evidenceSnippet": "pring Security, Express Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, G",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Redis",
+            "originalSkill": "Redis",
+            "normalizedSkill": "Redis",
+            "evidenceSnippet": "ress Databases: PostgreSQL, MySQL, Redis DevOps & Tools: Docker, Git, GitHub Actions,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "GitHub",
+            "originalSkill": "GitHub",
+            "normalizedSkill": "GitHub",
+            "evidenceSnippet": "+91 9876543210 | Bengaluru, India GitHub: github.com/lakshman | LinkedIn: linkedin.co",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Linux",
+            "originalSkill": "Linux",
+            "normalizedSkill": "Linux",
+            "evidenceSnippet": "t, GitHub Actions, Maven, Postman, Linux WORK EXPERIENCE Junior Java Developer - Tec",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JUnit",
+            "originalSkill": "JUnit",
+            "normalizedSkill": "JUnit",
+            "evidenceSnippet": "r containerization, Hibernate, and JUnit testing. TECHNICAL SKILLS Languages: Java (",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Mockito",
+            "originalSkill": "Mockito",
+            "normalizedSkill": "Mockito",
+            "evidenceSnippet": "ntegration tests using JUnit 5 and Mockito, achieving 85% test coverage. EDUCATION B.T",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "JavaScript",
+            "originalSkill": "JavaScript",
+            "normalizedSkill": "JavaScript",
+            "evidenceSnippet": "es: Java (Java 8/17), Python, SQL, JavaScript Frameworks & Libraries: Spring Boot, Spring",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Express.js",
+            "originalSkill": "Express",
+            "normalizedSkill": "Express.js",
+            "evidenceSnippet": "a JPA, Hibernate, Spring Security, Express Databases: PostgreSQL, MySQL, Redis DevOps &",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Kafka",
+            "originalSkill": "Kafka",
+            "normalizedSkill": "Kafka",
+            "evidenceSnippet": "nd with Spring Boot, Spring Cloud, Kafka, and PostgreSQL. - Implemented inventory, or",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": true
+          },
+          {
+            "skill": "Postman",
+            "originalSkill": "Postman",
+            "normalizedSkill": "Postman",
+            "evidenceSnippet": "ocker, Git, GitHub Actions, Maven, Postman, Linux WORK EXPERIENCE Junior Java Develope",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          }
+        ],
+        "achievements": [],
+        "languages": []
+      },
+      "extractedResumeText": "LAKSHMAN REDDY\nEmail: lakshman@example.com | Phone: +91 9876543210 | Bengaluru, India\nGitHub: github.com/lakshman | LinkedIn: linkedin.com/in/lakshman\n\nPROFESSIONAL SUMMARY\nBackend developer with 2+ years of experience in Java, Spring Boot, REST APIs, Microservices, and SQL database design. Experienced in Docker containerization, Hibernate, and JUnit testing.\n\nTECHNICAL SKILLS\nLanguages: Java (Java 8/17), Python, SQL, JavaScript\nFrameworks & Libraries: Spring Boot, Spring Data JPA, Hibernate, Spring Security, Express\nDatabases: PostgreSQL, MySQL, Redis\nDevOps & Tools: Docker, Git, GitHub Actions, Maven, Postman, Linux\n\nWORK EXPERIENCE\nJunior Java Developer - TechCorp Solutions (June 2024 - Present)\n- Developed and maintained RESTful APIs using Java 17 and Spring Boot microservices architecture.\n- Designed database schemas and optimized complex SQL queries in PostgreSQL, improving query response time by 30%.\n- Implemented JWT authentication and role-based access control with Spring Security.\n- Integrated Redis caching to reduce latency on high-throughput read operations.\n- Containerized Spring Boot applications with Docker and deployed via CI/CD pipelines.\n\nPROJECTS\nE-Commerce Microservices Platform\n- Architected a distributed e-commerce backend with Spring Boot, Spring Cloud, Kafka, and PostgreSQL.\n- Implemented inventory, order, and payment services with resilient fault tolerance using Resilience4j.\n- Wrote unit and integration tests using JUnit 5 and Mockito, achieving 85% test coverage.\n\nEDUCATION\nB.Tech in Computer Science and Engineering - 2024\nCGPA: 8.8 / 10.0",
+      "fileMimeType": "text/plain",
+      "ocrUsed": false,
+      "extractionMethod": "text-direct",
+      "extractionQuality": "High",
+      "sourceType": "file",
+      "detectedLanguage": "English",
+      "isCachedParse": true,
+      "isDemoMode": false,
+      "createdAt": "2026-09-25T05:00:46.095Z",
+      "updatedAt": "2026-09-25T05:00:46.095Z",
+      "opportunityId": "job-001",
+      "opportunityTitle": "Junior Java Backend Developer",
+      "opportunityCompany": "ABC Technologies",
+      "opportunityRequiredSkills": [
+        "Java",
+        "Spring Boot",
+        "SQL",
+        "REST API",
+        "JPA/Hibernate",
+        "Git"
+      ],
+      "opportunityPreferredSkills": [
+        "Docker",
+        "Microservices",
+        "Redis",
+        "AWS"
+      ],
+      "opportunityDescription": "Join our Core Banking Microservices team. You will build high-concurrency Spring Boot REST services, optimize relational queries, and integrate with message brokers.",
+      "opportunityMatchedSkills": [
+        "Java",
+        "Spring Boot",
+        "SQL",
+        "REST API",
+        "JPA/Hibernate",
+        "Git"
+      ],
+      "opportunityMissingSkills": [],
+      "opportunityPartialSkills": []
     }
   },
   "userAnalysisHistory": {
@@ -12113,6 +12936,9 @@
     ],
     "john_doe_test": [
       "an-1790089168147-bb6c478e"
+    ],
+    "test_student@example.com": [
+      "an-1790312446081-dc87c993"
     ]
   },
   "llmLogs": [],
@@ -12322,6 +13148,26 @@
       "experienceCount": 0,
       "analysisIds": [
         "an-1790253119501-5bde46a3"
+      ]
+    },
+    "resume-bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648-test_student@example.com": {
+      "resumeId": "resume-bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648-test_student@example.com",
+      "userId": "test_student@example.com",
+      "fileHash": "bde2dacc2fef4150f4e5a5c5455fd6ab2c59445cfbcc425b18af95fc6e8e9648",
+      "fileName": "Lakshman_Resume.txt",
+      "fileSize": 1592,
+      "fileMimeType": "text/plain",
+      "uploadedAt": "2026-09-25T05:00:46.099Z",
+      "lastAnalyzedAt": "2026-09-25T05:00:46.099Z",
+      "latestAnalysisId": "an-1790312446081-dc87c993",
+      "latestAtsScore": 82,
+      "latestSkillGapScore": 100,
+      "candidateName": "LAKSHMAN REDDY",
+      "detectedSkillsCount": 23,
+      "projectCount": 1,
+      "experienceCount": 0,
+      "analysisIds": [
+        "an-1790312446081-dc87c993"
       ]
     }
   },
