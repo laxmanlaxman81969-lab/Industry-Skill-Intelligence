@@ -1140,7 +1140,7 @@ var OCRService = class _OCRService {
     console.log("[OCR] Initializing Tesseract OCR worker...");
     if (onProgress) onProgress(10, "Initializing OCR engine...");
     let worker = null;
-    try {
+    const ocrPromise = (async () => {
       const { createWorker } = await import("tesseract.js");
       worker = await createWorker("eng", 1, {
         cachePath: process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME ? "/tmp" : void 0
@@ -1156,8 +1156,14 @@ var OCRService = class _OCRService {
         text: cleanedText,
         confidence
       };
+    })();
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("OCR engine timed out after 10 seconds.")), 1e4);
+    });
+    try {
+      return await Promise.race([ocrPromise, timeoutPromise]);
     } catch (err) {
-      console.error("[OCR] OCR execution failed:", err);
+      console.error("[OCR] OCR execution failed or timed out:", err.message);
       throw new Error("OCR text recognition failed on document. Please ensure the image/scan is clear and legible.");
     } finally {
       if (worker) {
@@ -1454,20 +1460,22 @@ var FileParserService = class _FileParserService {
           }
         }
         if (!this.isPdfTextSufficient(rawText)) {
-          console.log("[Parser] Scanned or low-density PDF detected. Automatically invoking OCR...");
+          console.log("[Parser] Scanned or low-density PDF detected. Attempting OCR fallback with timeout...");
           if (onStatusUpdate) onStatusUpdate("Scanned resume detected. Running OCR...");
           try {
-            const ocrResult = await this.ocr.performOCR(buffer, (_pct, msg) => {
+            const ocrPromise = this.ocr.performOCR(buffer, (_pct, msg) => {
               if (onStatusUpdate) onStatusUpdate(msg);
             });
-            if (ocrResult.text && ocrResult.text.trim().length > rawText.trim().length) {
+            const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 8e3));
+            const ocrResult = await Promise.race([ocrPromise, timeoutPromise]);
+            if (ocrResult && ocrResult.text && ocrResult.text.trim().length > rawText.trim().length) {
               rawText = ocrResult.text;
               ocrConfidence = ocrResult.confidence;
               extractionMethod = "tesseract-ocr";
               ocrUsed = true;
             }
           } catch (ocrErr) {
-            console.warn("[Parser] PDF OCR fallback encountered error:", ocrErr);
+            console.warn("[Parser] PDF OCR fallback encountered error or timed out:", ocrErr);
           }
         }
       } else if (detectedType === "doc") {
@@ -1524,12 +1532,10 @@ var FileParserService = class _FileParserService {
     const trimmed = text.trim();
     if (!trimmed) return false;
     const words = trimmed.split(/\s+/).filter(Boolean);
-    if (words.length < 40) return false;
+    if (words.length < 15) return false;
     const alphabeticChars = (trimmed.match(/[a-zA-Z]/g) || []).length;
     const totalChars = trimmed.length;
-    if (alphabeticChars / totalChars < 0.4) return false;
-    const uniqueWords = new Set(words.map((w) => w.toLowerCase()));
-    if (words.length > 30 && uniqueWords.size < 6) return false;
+    if (totalChars > 0 && alphabeticChars / totalChars < 0.25) return false;
     return true;
   }
   /**

@@ -28,7 +28,7 @@ export class OCRService {
     if (onProgress) onProgress(10, 'Initializing OCR engine...');
 
     let worker: any = null;
-    try {
+    const ocrPromise = (async () => {
       const { createWorker } = await import('tesseract.js');
       worker = await createWorker('eng', 1, {
         cachePath: process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME ? '/tmp' : undefined
@@ -48,8 +48,16 @@ export class OCRService {
         text: cleanedText,
         confidence
       };
+    })();
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('OCR engine timed out after 10 seconds.')), 10000);
+    });
+
+    try {
+      return await Promise.race([ocrPromise, timeoutPromise]);
     } catch (err: any) {
-      console.error('[OCR] OCR execution failed:', err);
+      console.error('[OCR] OCR execution failed or timed out:', err.message);
       throw new Error('OCR text recognition failed on document. Please ensure the image/scan is clear and legible.');
     } finally {
       if (worker) {

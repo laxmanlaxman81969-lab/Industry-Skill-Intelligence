@@ -277,20 +277,22 @@ export class FileParserService {
 
         // Quality check: Check if PDF is scanned, empty, or garbled
         if (!this.isPdfTextSufficient(rawText)) {
-          console.log('[Parser] Scanned or low-density PDF detected. Automatically invoking OCR...');
+          console.log('[Parser] Scanned or low-density PDF detected. Attempting OCR fallback with timeout...');
           if (onStatusUpdate) onStatusUpdate('Scanned resume detected. Running OCR...');
           try {
-            const ocrResult = await this.ocr.performOCR(buffer, (_pct, msg) => {
+            const ocrPromise = this.ocr.performOCR(buffer, (_pct, msg) => {
               if (onStatusUpdate) onStatusUpdate(msg);
             });
-            if (ocrResult.text && ocrResult.text.trim().length > rawText.trim().length) {
+            const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
+            const ocrResult = await Promise.race([ocrPromise, timeoutPromise]);
+            if (ocrResult && ocrResult.text && ocrResult.text.trim().length > rawText.trim().length) {
               rawText = ocrResult.text;
               ocrConfidence = ocrResult.confidence;
               extractionMethod = 'tesseract-ocr';
               ocrUsed = true;
             }
           } catch (ocrErr) {
-            console.warn('[Parser] PDF OCR fallback encountered error:', ocrErr);
+            console.warn('[Parser] PDF OCR fallback encountered error or timed out:', ocrErr);
           }
         }
       }
@@ -380,16 +382,12 @@ export class FileParserService {
     if (!trimmed) return false;
 
     const words = trimmed.split(/\s+/).filter(Boolean);
-    if (words.length < 40) return false;
+    if (words.length < 15) return false;
 
     // Check alphabetic ratio (garbled/binary junk detection)
     const alphabeticChars = (trimmed.match(/[a-zA-Z]/g) || []).length;
     const totalChars = trimmed.length;
-    if (alphabeticChars / totalChars < 0.40) return false;
-
-    // Check for repetitive single-character loops
-    const uniqueWords = new Set(words.map(w => w.toLowerCase()));
-    if (words.length > 30 && uniqueWords.size < 6) return false;
+    if (totalChars > 0 && alphabeticChars / totalChars < 0.25) return false;
 
     return true;
   }
