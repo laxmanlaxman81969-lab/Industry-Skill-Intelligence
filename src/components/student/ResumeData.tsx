@@ -196,7 +196,7 @@ export const ResumeData: React.FC<ResumeDataProps> = ({ onNavigate, onNavigateTo
             {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
             {isUploading ? 'Uploading...' : 'Upload Resume'}
           </button>
-          <input ref={fileInputRef} type="file" accept=".pdf,.docx,.doc,.txt" className="hidden" onChange={handleFileUpload} />
+          <input ref={fileInputRef} type="file" accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.html,.htm,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileUpload} />
         </div>
       </div>
 

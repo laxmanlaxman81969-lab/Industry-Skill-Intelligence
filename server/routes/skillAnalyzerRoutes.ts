@@ -10,7 +10,8 @@ import { ClaudeExtractionService } from '../services/claudeExtractionService';
 import { ComparisonEngine } from '../services/comparisonEngine';
 import { ScoringService } from '../services/scoringService';
 import { PDFReportService } from '../services/pdfReportService';
-import { AnalysisRecord, ServerResumeRecord } from '../types';
+import { UrlResumeService } from '../services/urlResumeService';
+import { AnalysisRecord, ServerResumeRecord, ParsedResumeDocument } from '../types';
 
 export const skillAnalyzerRouter = Router();
 
@@ -19,11 +20,20 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = (file.originalname.split('.').pop() || '').toLowerCase();
-    const allowed = ['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'webp'];
-    if (allowed.includes(ext) || file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+    const allowed = ['pdf', 'docx', 'doc', 'txt', 'rtf', 'odt', 'html', 'htm', 'png', 'jpg', 'jpeg', 'webp'];
+    if (
+      allowed.includes(ext) ||
+      file.mimetype.startsWith('image/') ||
+      file.mimetype.includes('pdf') ||
+      file.mimetype.includes('word') ||
+      file.mimetype.includes('opendocument') ||
+      file.mimetype.includes('rtf') ||
+      file.mimetype.includes('html') ||
+      file.mimetype.includes('text')
+    ) {
       cb(null, true);
     } else {
-      cb(new Error('Unsupported file type. Please upload PDF, DOCX, DOC, TXT, PNG, JPG, or WEBP.'));
+      cb(new Error('This file format is not supported. Please upload PDF, DOCX, DOC, TXT, RTF, ODT, HTML, or an image resume (PNG, JPG, WEBP).'));
     }
   }
 });
@@ -159,39 +169,51 @@ skillAnalyzerRouter.get('/opportunities/:id', (req: Request, res: Response) => {
   res.json({ success: true, opportunity });
 });
 
-// 4. POST /api/skill-analyzer/upload
-skillAnalyzerRouter.post('/upload', (req: Request, res: Response) => {
-  upload.single('resume')(req, res, async (err: any) => {
+// 4. POST /api/skill-analyzer/upload (and /parse)
+const handleUpload = (req: Request, res: Response) => {
+  upload.any()(req, res, async (err: any) => {
     if (err) {
       console.warn('[Route: Upload] Multer rejected file:', err.message);
       return res.status(400).json({
         success: false,
-        error: err.message || 'File upload failed. Supported formats: PDF, DOCX, DOC, TXT, PNG, JPG, WEBP.'
+        error: err.message || 'File upload failed. Supported formats: PDF, DOCX, DOC, TXT, RTF, ODT, HTML, or image resume (PNG, JPG, WEBP).'
       });
     }
 
     try {
-      if (!req.file) {
+      const files = req.files as Express.Multer.File[] | undefined;
+      const uploaded = (files && files.length > 0) ? files[0] : (req as any).file;
+
+      if (!uploaded) {
         return res.status(400).json({ success: false, error: 'No file uploaded.' });
       }
 
       const parseResult = await parserService.parseFile(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype
+        uploaded.buffer,
+        uploaded.originalname,
+        uploaded.mimetype
       );
 
       res.json({
         success: true,
+        source: {
+          type: parseResult.document.sourceType || 'file',
+          fileName: parseResult.document.fileName,
+          mimeType: parseResult.document.fileMimeType
+        },
         fileHash: parseResult.document.fileHash,
         fileName: parseResult.document.fileName,
         fileSize: parseResult.document.fileSize,
         wordCount: parseResult.document.wordCount,
         isCached: parseResult.isCached,
         message: parseResult.message,
+        extractionMethod: parseResult.document.extractionMethod,
+        extractionQuality: parseResult.document.extractionQuality,
         detectedLanguage: parseResult.document.detectedLanguage,
         isLanguageSupported: parseResult.document.isLanguageSupported,
         ocrUsed: parseResult.document.ocrUsed,
+        ocrConfidence: parseResult.document.ocrConfidence,
+        detectedSections: parseResult.document.detectedSections,
         extractedTextPreview: parseResult.document.extractedText.slice(0, 500)
       });
     } catch (parseErr: any) {
@@ -202,7 +224,203 @@ skillAnalyzerRouter.post('/upload', (req: Request, res: Response) => {
       });
     }
   });
-});
+};
+
+skillAnalyzerRouter.post('/upload', handleUpload);
+skillAnalyzerRouter.post('/parse', handleUpload);
+
+/**
+ * Universal analysis pipeline shared between file analysis and URL resume analysis.
+ */
+async function executeAnalysisPipeline(params: {
+  parsedDoc: ParsedResumeDocument;
+  roleId: string;
+  userId: string;
+  isDemoMode?: boolean;
+  opportunityId?: string;
+  opportunityTitle?: string;
+  opportunityCompany?: string;
+  opportunityRequiredSkills?: string[];
+  opportunityPreferredSkills?: string[];
+  opportunityDescription?: string;
+}): Promise<AnalysisRecord> {
+  const {
+    parsedDoc,
+    roleId,
+    userId,
+    isDemoMode = false,
+    opportunityId,
+    opportunityTitle,
+    opportunityCompany,
+    opportunityRequiredSkills,
+    opportunityPreferredSkills,
+    opportunityDescription
+  } = params;
+
+  let finalOppTitle = opportunityTitle;
+  let finalOppCompany = opportunityCompany;
+  let finalOppReqSkills = opportunityRequiredSkills;
+  let finalOppPrefSkills = opportunityPreferredSkills;
+  let finalOppDesc = opportunityDescription;
+  let effectiveRoleId = roleId;
+
+  if (opportunityId) {
+    const oppRecord = db.getOpportunityById(opportunityId);
+    if (oppRecord) {
+      finalOppTitle = finalOppTitle || oppRecord.title;
+      finalOppCompany = finalOppCompany || oppRecord.companyName;
+      finalOppReqSkills = (finalOppReqSkills && finalOppReqSkills.length > 0)
+        ? finalOppReqSkills
+        : oppRecord.requiredSkills.map((s) => s.skill);
+      finalOppPrefSkills = (finalOppPrefSkills && finalOppPrefSkills.length > 0)
+        ? finalOppPrefSkills
+        : (oppRecord.preferredSkills || []);
+      finalOppDesc = finalOppDesc || oppRecord.description;
+
+      // Auto-match taxonomy to opportunity role if default role was provided
+      if (!roleId || roleId === 'java-backend-developer') {
+        const matchedTax = db.getTaxonomyByRoleId(oppRecord.role || oppRecord.title);
+        if (matchedTax) {
+          effectiveRoleId = matchedTax.roleId;
+        }
+      }
+    }
+  }
+
+  const taxonomy = db.getTaxonomyByRoleId(effectiveRoleId);
+  if (!taxonomy) {
+    throw new Error('Invalid role taxonomy selected.');
+  }
+
+  const analysisId = `an-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+
+  // 1. Check if extraction is already cached for this file hash
+  let extraction = db.getExtractionByHash(parsedDoc.fileHash);
+  let claudeResultWarnings: string[] = [];
+
+  const requiresExtractionRefresh = !extraction || extraction.extractionVersion !== 2 || extraction.skillsClaimed.some((skill) => !skill.originalSkill);
+  if (requiresExtractionRefresh) {
+    const claudeResult = await claudeService.extractSkills(
+      parsedDoc.extractedText,
+      parsedDoc.detectedSections,
+      analysisId
+    );
+    extraction = claudeResult.extraction;
+    claudeResultWarnings = claudeResult.warnings;
+    db.saveExtraction(parsedDoc.fileHash, extraction);
+  } else {
+    extraction = claudeService.validateAndVerifyEvidence(extraction, parsedDoc.extractedText);
+    db.saveExtraction(parsedDoc.fileHash, extraction);
+  }
+
+  // 2. Deterministic Benchmark Comparison against selected role taxonomy
+  const comparison = ComparisonEngine.compare(extraction, taxonomy);
+
+  // 3. Transparent 0-100 Score Calculation
+  const scoring = ScoringService.calculateScore(
+    comparison,
+    taxonomy,
+    extraction,
+    parsedDoc.wordCount
+  );
+
+  const allWarnings = [
+    ...claudeResultWarnings,
+    ...scoring.warnings
+  ];
+
+  if (!parsedDoc.isLanguageSupported) {
+    allWarnings.push(`This resume appears to be written primarily in ${parsedDoc.detectedLanguage}. Analysis support may vary.`);
+  }
+
+  // 4. Compute opportunity-specific skill overlap (when opportunity context is provided)
+  let opportunityMatchedSkills: string[] | undefined;
+  let opportunityMissingSkills: string[] | undefined;
+  let opportunityPartialSkills: string[] | undefined;
+
+  if (finalOppReqSkills && Array.isArray(finalOppReqSkills) && finalOppReqSkills.length > 0) {
+    const verifiedSkillNames = extraction.skillsClaimed
+      .filter((s) => s.verifiedInText)
+      .map((s) => s.originalSkill || s.skill);
+    const overlap = computeOpportunityOverlap(
+      verifiedSkillNames,
+      finalOppReqSkills,
+      finalOppPrefSkills || []
+    );
+    opportunityMatchedSkills = overlap.matched;
+    opportunityMissingSkills = overlap.missing;
+    opportunityPartialSkills = overlap.partial;
+  }
+
+  // 5. Construct Final Persistent Analysis Record
+  const analysisRecord: AnalysisRecord = {
+    analysisId,
+    userId,
+    fileHash: parsedDoc.fileHash,
+    fileName: parsedDoc.fileName,
+    fileSize: parsedDoc.fileSize,
+    roleId: taxonomy.roleId,
+    roleName: taxonomy.roleName,
+    taxonomyVersion: taxonomy.taxonomyVersion,
+    benchmarkRefreshDate: taxonomy.lastUpdated,
+    status: 'COMPLETED',
+    confidenceRating: scoring.confidenceRating,
+    confidenceExplanation: scoring.confidenceExplanation,
+    warnings: allWarnings,
+    scoreBreakdown: scoring.scoreBreakdown,
+    atsScore: scoring.atsScore,
+    skillGapScore: scoring.skillGapScore,
+    matchedSkills: comparison.matchedSkills,
+    missingSkills: comparison.missingSkills,
+    partialSkills: comparison.partialSkills,
+    uncertainSkills: comparison.uncertainSkills,
+    irrelevantSkills: comparison.irrelevantSkills,
+    whatToLearnNext: comparison.whatToLearnNext,
+    candidateName: extraction.candidateName || 'Candidate',
+    extractionSummary: {
+      totalYearsExperience: extraction.totalYearsExperience,
+      educationSummary: extraction.education.map((e) => `${e.degree} from ${e.institution}`).join(', '),
+      projectCount: extraction.projects.length,
+      certificationsCount: extraction.certifications.length,
+      totalClaimedSkills: extraction.skillsClaimed.length,
+      verifiedSkillsCount: extraction.skillsClaimed.filter((s) => s.verifiedInText).length
+    },
+    structuredExtraction: extraction,
+    extractedResumeText: parsedDoc.extractedText,
+    fileMimeType: parsedDoc.fileMimeType,
+    ocrUsed: parsedDoc.ocrUsed,
+    ocrConfidence: parsedDoc.ocrConfidence,
+    extractionMethod: parsedDoc.extractionMethod,
+    extractionQuality: parsedDoc.extractionQuality,
+    sourceType: parsedDoc.sourceType || 'file',
+    sourceUrl: parsedDoc.sourceUrl,
+    detectedLanguage: parsedDoc.detectedLanguage,
+    isCachedParse: !!parsedDoc.fileHash,
+    isDemoMode,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // Opportunity context
+    opportunityId,
+    opportunityTitle: finalOppTitle,
+    opportunityCompany: finalOppCompany,
+    opportunityRequiredSkills: finalOppReqSkills,
+    opportunityPreferredSkills: finalOppPrefSkills,
+    opportunityDescription: finalOppDesc,
+    opportunityMatchedSkills,
+    opportunityMissingSkills,
+    opportunityPartialSkills
+  };
+
+  // 6. Save analysis to Database
+  db.saveAnalysis(analysisRecord);
+
+  // 7. Auto-save or update server-side resume record
+  const existing = db.getResumeRecordByHash(parsedDoc.fileHash, userId);
+  const resumeRecord = buildOrUpdateResumeRecord(existing, analysisRecord);
+  db.saveResumeRecord(resumeRecord);
+
+  return analysisRecord;
+}
 
 // 5. POST /api/skill-analyzer/analyze
 skillAnalyzerRouter.post('/analyze', async (req: Request, res: Response) => {
@@ -214,7 +432,6 @@ skillAnalyzerRouter.post('/analyze', async (req: Request, res: Response) => {
       customText,
       fileName = 'Resume.pdf',
       isDemoMode = false,
-      // Opportunity context (optional)
       opportunityId,
       opportunityTitle,
       opportunityCompany,
@@ -239,162 +456,18 @@ skillAnalyzerRouter.post('/analyze', async (req: Request, res: Response) => {
       });
     }
 
-    let finalOppTitle = opportunityTitle;
-    let finalOppCompany = opportunityCompany;
-    let finalOppReqSkills = opportunityRequiredSkills;
-    let finalOppPrefSkills = opportunityPreferredSkills;
-    let finalOppDesc = opportunityDescription;
-    let effectiveRoleId = roleId;
-
-    if (opportunityId) {
-      const oppRecord = db.getOpportunityById(opportunityId);
-      if (oppRecord) {
-        finalOppTitle = finalOppTitle || oppRecord.title;
-        finalOppCompany = finalOppCompany || oppRecord.companyName;
-        finalOppReqSkills = (finalOppReqSkills && finalOppReqSkills.length > 0)
-          ? finalOppReqSkills
-          : oppRecord.requiredSkills.map((s) => s.skill);
-        finalOppPrefSkills = (finalOppPrefSkills && finalOppPrefSkills.length > 0)
-          ? finalOppPrefSkills
-          : (oppRecord.preferredSkills || []);
-        finalOppDesc = finalOppDesc || oppRecord.description;
-
-        // Auto-match taxonomy to opportunity role if default role was provided
-        if (!roleId || roleId === 'java-backend-developer') {
-          const matchedTax = db.getTaxonomyByRoleId(oppRecord.role || oppRecord.title);
-          if (matchedTax) {
-            effectiveRoleId = matchedTax.roleId;
-          }
-        }
-      }
-    }
-
-    const taxonomy = db.getTaxonomyByRoleId(effectiveRoleId);
-    if (!taxonomy) {
-      return res.status(400).json({ success: false, error: 'Invalid role taxonomy selected.' });
-    }
-
-    const analysisId = `an-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-
-    // 1. Check if extraction is already cached for this file hash
-    let extraction = db.getExtractionByHash(parsedDoc.fileHash);
-    let claudeResultWarnings: string[] = [];
-
-    const requiresExtractionRefresh = !extraction || extraction.extractionVersion !== 2 || extraction.skillsClaimed.some((skill) => !skill.originalSkill);
-    if (requiresExtractionRefresh) {
-      const claudeResult = await claudeService.extractSkills(
-        parsedDoc.extractedText,
-        parsedDoc.detectedSections,
-        analysisId
-      );
-      extraction = claudeResult.extraction;
-      claudeResultWarnings = claudeResult.warnings;
-      db.saveExtraction(parsedDoc.fileHash, extraction);
-    } else {
-      extraction = claudeService.validateAndVerifyEvidence(extraction, parsedDoc.extractedText);
-      db.saveExtraction(parsedDoc.fileHash, extraction);
-    }
-
-    // 2. Deterministic Benchmark Comparison against selected role taxonomy
-    const comparison = ComparisonEngine.compare(extraction, taxonomy);
-
-    // 3. Transparent 0-100 Score Calculation
-    const scoring = ScoringService.calculateScore(
-      comparison,
-      taxonomy,
-      extraction,
-      parsedDoc.wordCount
-    );
-
-    const allWarnings = [
-      ...claudeResultWarnings,
-      ...scoring.warnings
-    ];
-
-    if (!parsedDoc.isLanguageSupported) {
-      allWarnings.push(`This resume appears to be written primarily in ${parsedDoc.detectedLanguage}. Analysis support may vary.`);
-    }
-
-    // 4. Compute opportunity-specific skill overlap (when opportunity context is provided)
-    let opportunityMatchedSkills: string[] | undefined;
-    let opportunityMissingSkills: string[] | undefined;
-    let opportunityPartialSkills: string[] | undefined;
-
-    if (finalOppReqSkills && Array.isArray(finalOppReqSkills) && finalOppReqSkills.length > 0) {
-      const verifiedSkillNames = extraction.skillsClaimed
-        .filter((s) => s.verifiedInText)
-        .map((s) => s.originalSkill || s.skill);
-      const overlap = computeOpportunityOverlap(
-        verifiedSkillNames,
-        finalOppReqSkills,
-        finalOppPrefSkills || []
-      );
-      opportunityMatchedSkills = overlap.matched;
-      opportunityMissingSkills = overlap.missing;
-      opportunityPartialSkills = overlap.partial;
-    }
-
-    // 5. Construct Final Persistent Analysis Record
-    const analysisRecord: AnalysisRecord = {
-      analysisId,
+    const analysisRecord = await executeAnalysisPipeline({
+      parsedDoc,
+      roleId,
       userId,
-      fileHash: parsedDoc.fileHash,
-      fileName: parsedDoc.fileName,
-      fileSize: parsedDoc.fileSize,
-      roleId: taxonomy.roleId,
-      roleName: taxonomy.roleName,
-      taxonomyVersion: taxonomy.taxonomyVersion,
-      benchmarkRefreshDate: taxonomy.lastUpdated,
-      status: 'COMPLETED',
-      confidenceRating: scoring.confidenceRating,
-      confidenceExplanation: scoring.confidenceExplanation,
-      warnings: allWarnings,
-      scoreBreakdown: scoring.scoreBreakdown,
-      atsScore: scoring.atsScore,
-      skillGapScore: scoring.skillGapScore,
-      matchedSkills: comparison.matchedSkills,
-      missingSkills: comparison.missingSkills,
-      partialSkills: comparison.partialSkills,
-      uncertainSkills: comparison.uncertainSkills,
-      irrelevantSkills: comparison.irrelevantSkills,
-      whatToLearnNext: comparison.whatToLearnNext,
-      candidateName: extraction.candidateName || 'Candidate',
-      extractionSummary: {
-        totalYearsExperience: extraction.totalYearsExperience,
-        educationSummary: extraction.education.map((e) => `${e.degree} from ${e.institution}`).join(', '),
-        projectCount: extraction.projects.length,
-        certificationsCount: extraction.certifications.length,
-        totalClaimedSkills: extraction.skillsClaimed.length,
-        verifiedSkillsCount: extraction.skillsClaimed.filter((s) => s.verifiedInText).length
-      },
-      structuredExtraction: extraction,
-      extractedResumeText: parsedDoc.extractedText,
-      fileMimeType: parsedDoc.fileMimeType,
-      ocrUsed: parsedDoc.ocrUsed,
-      detectedLanguage: parsedDoc.detectedLanguage,
-      isCachedParse: !!fileHash,
       isDemoMode,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      // Opportunity context
       opportunityId,
-      opportunityTitle: finalOppTitle,
-      opportunityCompany: finalOppCompany,
-      opportunityRequiredSkills: finalOppReqSkills,
-      opportunityPreferredSkills: finalOppPrefSkills,
-      opportunityDescription: finalOppDesc,
-      opportunityMatchedSkills,
-      opportunityMissingSkills,
-      opportunityPartialSkills
-    };
-
-    // 6. Save analysis to Database
-    db.saveAnalysis(analysisRecord);
-
-    // 7. Auto-save or update server-side resume record
-    const existing = db.getResumeRecordByHash(parsedDoc.fileHash, userId);
-    const resumeRecord = buildOrUpdateResumeRecord(existing, analysisRecord);
-    db.saveResumeRecord(resumeRecord);
+      opportunityTitle,
+      opportunityCompany,
+      opportunityRequiredSkills,
+      opportunityPreferredSkills,
+      opportunityDescription
+    });
 
     res.json({
       success: true,
@@ -405,6 +478,68 @@ skillAnalyzerRouter.post('/analyze', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: err.message || "Couldn't confidently analyze this resume."
+    });
+  }
+});
+
+// 5b. POST /api/skill-analyzer/analyze-url
+skillAnalyzerRouter.post('/analyze-url', async (req: Request, res: Response) => {
+  try {
+    const {
+      url,
+      roleId = 'java-backend-developer',
+      userId = 'default_user',
+      isDemoMode = false,
+      opportunityId,
+      opportunityTitle,
+      opportunityCompany,
+      opportunityRequiredSkills,
+      opportunityPreferredSkills,
+      opportunityDescription
+    } = req.body;
+
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      return res.status(400).json({ success: false, error: 'Please provide a valid resume URL.' });
+    }
+
+    const urlService = UrlResumeService.getInstance();
+    const fetched = await urlService.fetchResumeFromUrl(url.trim());
+
+    const parseResult = await parserService.parseFile(
+      fetched.buffer,
+      fetched.fileName,
+      fetched.mimeType,
+      undefined,
+      { type: 'url', url: fetched.sourceUrl }
+    );
+
+    const analysisRecord = await executeAnalysisPipeline({
+      parsedDoc: parseResult.document,
+      roleId,
+      userId,
+      isDemoMode,
+      opportunityId,
+      opportunityTitle,
+      opportunityCompany,
+      opportunityRequiredSkills,
+      opportunityPreferredSkills,
+      opportunityDescription
+    });
+
+    res.json({
+      success: true,
+      analysis: analysisRecord,
+      source: {
+        type: 'url',
+        url: fetched.sourceUrl,
+        fileName: fetched.fileName
+      }
+    });
+  } catch (err: any) {
+    console.error('[Route: Analyze-URL] Error:', err);
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Unable to access this resume URL.'
     });
   }
 });

@@ -5,7 +5,8 @@ import { AnalysisRecord, RoleTaxonomyRecord, PipelineStatus } from '../../../ser
 import {
   Upload, FileText, Sparkles, CheckCircle2, AlertTriangle, ArrowRight,
   BrainCircuit, Target, ChevronRight, Briefcase, Building2, X, Loader2,
-  Clock, Check, ArrowLeft, FolderOpen, RefreshCw, AlertCircle, Zap
+  Clock, Check, ArrowLeft, FolderOpen, RefreshCw, AlertCircle, Zap,
+  Link as LinkIcon, Image as ImageIcon
 } from 'lucide-react';
 
 interface SkillGapAnalyzerProps {
@@ -16,8 +17,8 @@ interface SkillGapAnalyzerProps {
 
 // Pipeline steps shown during analysis
 const PIPELINE_STEPS = [
-  { label: 'Uploading resume...', stage: 'UPLOADED' as PipelineStatus },
-  { label: 'Extracting text from document...', stage: 'PARSING' as PipelineStatus },
+  { label: 'Validating resume source...', stage: 'UPLOADED' as PipelineStatus },
+  { label: 'Detecting format & extracting content...', stage: 'PARSING' as PipelineStatus },
   { label: 'Detecting sections (Experience, Skills, Projects)...', stage: 'PARSED' as PipelineStatus },
   { label: 'AI extracting skills with evidence...', stage: 'AI_EXTRACTING' as PipelineStatus },
   { label: 'Verifying evidence for each skill...', stage: 'AI_RETRYING' as PipelineStatus },
@@ -48,10 +49,27 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
   const [selectedRole, setSelectedRole] = useState<string>(studentProfile.targetRole || 'Java Backend Developer');
   const [currentTaxonomy, setCurrentTaxonomy] = useState<RoleTaxonomyRecord | null>(null);
 
-  // ── File upload state ─────────────────────────────────────
+  // ── Input mode & File upload state ────────────────────────
+  const [inputMode, setInputMode] = useState<'file' | 'url'>('file');
+  const [resumeUrl, setResumeUrl] = useState('');
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [uploadStatusText, setUploadStatusText] = useState('Uploading resume...');
+  const [lastAction, setLastAction] = useState<(() => void) | null>(null);
+
   const [uploadedFile, setUploadedFile] = useState<{
-    name: string; size: string; hash?: string; wordCount?: number;
-    ocrUsed?: boolean; isCached?: boolean; textPreview?: string;
+    name: string;
+    size: string;
+    hash?: string;
+    wordCount?: number;
+    ocrUsed?: boolean;
+    ocrConfidence?: number;
+    isCached?: boolean;
+    textPreview?: string;
+    imagePreview?: string | null;
+    isImage?: boolean;
+    isUrl?: boolean;
+    url?: string;
+    extractionMethod?: string;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -64,7 +82,6 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
   const [pipelineStep, setPipelineStep] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [claudeConfigured, setClaudeConfigured] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -79,7 +96,7 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
           SkillAnalyzerApi.getStatus(),
           SkillAnalyzerApi.getRoles(),
         ]);
-        setClaudeConfigured(statusRes.claudeConfigured);
+        void statusRes; // status fetched for future use
         if (rolesRes.success) setDbRoles(rolesRes.roles);
       } catch { /* offline — proceed */ }
     })();
@@ -122,12 +139,26 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
 
   // ── Helpers ───────────────────────────────────────────────
   const showToast = (msg: string) => { setToastMessage(msg); setTimeout(() => setToastMessage(null), 4000); };
-  const showError = (msg: string) => { setErrorMessage(msg); setTimeout(() => setErrorMessage(null), 7000); };
+  const showError = (msg: string) => { setErrorMessage(msg); setTimeout(() => setErrorMessage(null), 8000); };
 
   // ── Upload handler ────────────────────────────────────────
   const processFile = async (file: File) => {
     setErrorMessage(null);
     setIsUploading(true);
+    setLastAction(() => () => processFile(file));
+
+    const isImg = file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name);
+    let preview: string | null = null;
+    if (isImg) {
+      preview = URL.createObjectURL(file);
+      setImagePreviewUrl(preview);
+      setUploadStatusText('Image resume detected. Running OCR...');
+    } else if (/\.pdf$/i.test(file.name)) {
+      setUploadStatusText('Extracting PDF content (with OCR check)...');
+    } else {
+      setUploadStatusText('Extracting document content...');
+    }
+
     try {
       const res: UploadResponse = await SkillAnalyzerApi.uploadResume(file);
       setUploadedFile({
@@ -136,11 +167,20 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
         hash: res.fileHash,
         wordCount: res.wordCount,
         ocrUsed: res.ocrUsed,
+        ocrConfidence: res.ocrConfidence,
         isCached: res.isCached,
         textPreview: res.extractedTextPreview,
+        imagePreview: preview,
+        isImage: isImg,
+        isUrl: false,
+        extractionMethod: res.extractionMethod,
       });
-      setSelectedResumeId(null); // clear stored selection when new file chosen
-      showToast(`"${res.fileName}" loaded — ${res.wordCount} words extracted. Click Analyze to continue.`);
+      setSelectedResumeId(null);
+      if (res.ocrUsed) {
+        showToast(`Image resume processed via OCR — ${res.wordCount} words extracted.`);
+      } else {
+        showToast(`"${res.fileName}" loaded — ${res.wordCount} words extracted. Click Analyze to continue.`);
+      }
     } catch (err: any) {
       showError(err.message || 'Upload failed. Please check the file format.');
       setUploadedFile(null);
@@ -148,6 +188,24 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
+  };
+
+  const handleUrlImport = () => {
+    const trimmed = resumeUrl.trim();
+    if (!trimmed) {
+      showError('Please enter a valid resume URL.');
+      return;
+    }
+    setErrorMessage(null);
+    setUploadedFile({
+      name: trimmed.split('/').pop()?.split('?')[0] || 'Web_Resume',
+      size: 'Remote URL',
+      url: trimmed,
+      isUrl: true,
+      textPreview: `Resume imported from: ${trimmed}`,
+    });
+    setSelectedResumeId(null);
+    showToast('Resume URL loaded. Select an opportunity and click Analyze to continue.');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,14 +221,15 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
 
   // ── Core analysis executor ────────────────────────────────
   const handleAnalyze = async () => {
-    if (!uploadedFile?.hash && !selectedStoredResume) {
-      fileInputRef.current?.click();
+    if (!uploadedFile && !selectedStoredResume && !(inputMode === 'url' && resumeUrl.trim())) {
+      if (inputMode === 'file') fileInputRef.current?.click();
       return;
     }
 
     setErrorMessage(null);
     setIsAnalyzing(true);
     setPipelineStep(0);
+    setLastAction(() => handleAnalyze);
 
     // Animate pipeline steps
     const stepInterval = setInterval(() => {
@@ -192,29 +251,41 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
       const requiredSkills = opp?.requiredSkills?.map(s => s.skill) || [];
       const preferredSkills = (opp?.preferredSkills || []).map((s: any) => typeof s === 'string' ? s : s?.skill || s);
 
-      const response = await SkillAnalyzerApi.analyzeResume({
-        fileHash: uploadedFile?.hash || selectedStoredResume?.fileHash,
-        roleId,
-        userId: studentProfile.email || 'default_user',
-        fileName: uploadedFile?.name || selectedStoredResume?.fileName || 'Resume.pdf',
-        // Opportunity context
-        opportunityId: opp?.id,
-        opportunityTitle: opp?.title,
-        opportunityCompany: opp?.companyName || (opp as any)?.company,
-        opportunityRequiredSkills: requiredSkills.length > 0 ? requiredSkills : undefined,
-        opportunityPreferredSkills: preferredSkills.length > 0 ? preferredSkills : undefined,
-        opportunityDescription: opp?.description,
-      });
+      let response: any;
+      if (uploadedFile?.isUrl || (inputMode === 'url' && resumeUrl.trim())) {
+        response = await SkillAnalyzerApi.analyzeUrl({
+          url: uploadedFile?.url || resumeUrl.trim(),
+          roleId,
+          userId: studentProfile.email || 'default_user',
+          opportunityId: opp?.id,
+          opportunityTitle: opp?.title,
+          opportunityCompany: opp?.companyName || (opp as any)?.company,
+          opportunityRequiredSkills: requiredSkills.length > 0 ? requiredSkills : undefined,
+          opportunityPreferredSkills: preferredSkills.length > 0 ? preferredSkills : undefined,
+          opportunityDescription: opp?.description,
+        });
+      } else {
+        response = await SkillAnalyzerApi.analyzeResume({
+          fileHash: uploadedFile?.hash || selectedStoredResume?.fileHash,
+          roleId,
+          userId: studentProfile.email || 'default_user',
+          fileName: uploadedFile?.name || selectedStoredResume?.fileName || 'Resume.pdf',
+          opportunityId: opp?.id,
+          opportunityTitle: opp?.title,
+          opportunityCompany: opp?.companyName || (opp as any)?.company,
+          opportunityRequiredSkills: requiredSkills.length > 0 ? requiredSkills : undefined,
+          opportunityPreferredSkills: preferredSkills.length > 0 ? preferredSkills : undefined,
+          opportunityDescription: opp?.description,
+        });
+      }
 
       clearInterval(stepInterval);
       setPipelineStep(PIPELINE_STEPS.length - 1);
 
       if (response.success && response.analysis) {
         setLatestAnalysis(response.analysis);
-        // Store resume in library
         storeResumeLocally(response.analysis);
 
-        // Brief pause to show "complete" state, then navigate to result
         setTimeout(() => {
           if (onNavigate) onNavigate(`resume-analysis:${response.analysis.analysisId}`);
         }, 800);
@@ -308,7 +379,7 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
   };
 
   // ── Readiness check ───────────────────────────────────────
-  const hasResume = !!(uploadedFile?.hash || selectedStoredResume?.fileHash);
+  const hasResume = !!(uploadedFile?.hash || selectedStoredResume?.fileHash || uploadedFile?.isUrl || (inputMode === 'url' && resumeUrl.trim()));
   const hasOpportunity = !!selectedOpportunityContext;
   const canAnalyze = hasResume && hasOpportunity && !isAnalyzing && !isUploading;
   const step = !hasResume ? 1 : !selectedOpportunityContext ? 2 : 3;
@@ -332,17 +403,10 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
             <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
               AI Skill Analyzer
             </span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
-              claudeConfigured
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200'
-            }`}>
-              {claudeConfigured ? '● Live AI' : '● Offline Mode'}
-            </span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Resume & Opportunity Analysis</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Upload your resume, select an opportunity, and get evidence-based intelligence.
+            Upload your resume document or image, select an opportunity, and get evidence-based intelligence.
           </p>
         </div>
       </div>
@@ -351,7 +415,21 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
       {errorMessage && (
         <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
-          <span>{errorMessage}</span>
+          <div className="flex-1">
+            <p className="font-medium">{errorMessage}</p>
+            {lastAction && (
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage(null);
+                  lastAction();
+                }}
+                className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors shadow-2xs"
+              >
+                <RefreshCw className="w-3 h-3" /> Retry
+              </button>
+            )}
+          </div>
           <button onClick={() => setErrorMessage(null)} className="ml-auto text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
         </div>
       )}
@@ -470,30 +548,107 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
           )}
         </div>
 
+        {/* Source Mode Selector (Upload File vs Paste Resume URL) */}
+        {!uploadedFile && !selectedStoredResume && (
+          <div className="flex border-b border-slate-100 bg-slate-50/50 px-5 pt-2.5 gap-2">
+            <button
+              type="button"
+              onClick={() => { setInputMode('file'); setErrorMessage(null); }}
+              className={`pb-2 px-3 text-xs font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
+                inputMode === 'file'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Upload className="w-3.5 h-3.5" /> Upload File
+            </button>
+            <button
+              type="button"
+              onClick={() => { setInputMode('url'); setErrorMessage(null); }}
+              className={`pb-2 px-3 text-xs font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
+                inputMode === 'url'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <LinkIcon className="w-3.5 h-3.5" /> Paste Resume URL
+            </button>
+          </div>
+        )}
+
         <div className="p-5 space-y-4">
           {/* Uploaded / stored file card */}
           {(uploadedFile || selectedStoredResume) ? (
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
-              <FileText className="w-8 h-8 text-emerald-600 shrink-0" />
+            <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+              {uploadedFile?.imagePreview ? (
+                <img
+                  src={uploadedFile.imagePreview}
+                  alt="Resume thumbnail"
+                  className="w-12 h-12 object-cover rounded-lg border border-emerald-300 shrink-0 shadow-2xs"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">
-                  {uploadedFile?.name || selectedStoredResume?.fileName}
-                </p>
-                <p className="text-xs text-slate-500">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-900 truncate">
+                    {uploadedFile?.name || selectedStoredResume?.fileName}
+                  </p>
+                  {uploadedFile?.ocrUsed && (
+                    <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
+                      OCR
+                    </span>
+                  )}
+                  {uploadedFile?.isUrl && (
+                    <span className="text-[10px] font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded border border-blue-200 shrink-0">
+                      URL
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
                   {uploadedFile?.size || 'Stored resume'}{uploadedFile?.wordCount ? ` · ${uploadedFile.wordCount} words` : ''}
-                  {uploadedFile?.ocrUsed ? ' · OCR applied' : ''}
+                  {uploadedFile?.ocrUsed ? ' · Text extracted via OCR' : ''}
                 </p>
               </div>
               <button
-                onClick={() => { setUploadedFile(null); setSelectedResumeId(null); }}
+                onClick={() => { setUploadedFile(null); setSelectedResumeId(null); setImagePreviewUrl(null); }}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                 title="Remove"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
+          ) : inputMode === 'url' ? (
+            /* URL Input Section */
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/40 space-y-3">
+              <label className="block text-xs font-semibold text-slate-700">
+                Public Resume URL (PDF, HTML, or Image)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={resumeUrl}
+                  onChange={e => setResumeUrl(e.target.value)}
+                  placeholder="https://example.com/my-resume.pdf"
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                />
+                <button
+                  type="button"
+                  disabled={!resumeUrl.trim()}
+                  onClick={handleUrlImport}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-2xs shrink-0"
+                >
+                  Use URL
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Supports public web resumes, online PDFs, and hosted images. Password-protected or authenticated profiles (e.g. LinkedIn) cannot be imported.
+              </p>
+            </div>
           ) : (
-            /* Drop zone */
+            /* Drop zone for File Upload */
             <div
               onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
@@ -510,14 +665,16 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
               )}
               <div className="text-center">
                 <p className="text-sm font-semibold text-slate-700">
-                  {isUploading ? 'Uploading...' : 'Drop your resume here or click to browse'}
+                  {isUploading ? uploadStatusText : 'Drop your resume here or click to browse'}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">PDF, DOCX, DOC, TXT · Max 10 MB</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Upload PDF, DOCX, DOC, TXT, RTF, ODT, HTML, or Image (PNG, JPG, WEBP) · Max 10 MB
+                </p>
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.docx,.doc,.txt"
+                accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.html,.htm,.png,.jpg,.jpeg,.webp"
                 className="hidden"
                 onChange={handleFileChange}
               />
@@ -779,12 +936,6 @@ export const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({
                 {canAnalyze && <ArrowRight className="w-4 h-4" />}
               </button>
 
-              {!claudeConfigured && (
-                <p className="text-center text-[10px] text-amber-600 flex items-center justify-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  Running in offline mode — results are evidence-based but not AI-enhanced
-                </p>
-              )}
             </div>
           )}
         </div>

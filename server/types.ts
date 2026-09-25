@@ -64,8 +64,21 @@ export interface ParsedResumeDocument {
   fileMimeType: string;
   extractedText: string;
   wordCount: number;
-  extractionMethod: 'text-direct' | 'pdf-parse' | 'mammoth-docx' | 'tesseract-ocr';
+  extractionMethod:
+    | 'text-direct'
+    | 'pdf-parse'
+    | 'mammoth-docx'
+    | 'tesseract-ocr'
+    | 'rtf-parser'
+    | 'odt-parser'
+    | 'html-parser'
+    | 'doc-parser'
+    | 'url-extractor';
   ocrUsed: boolean;
+  ocrConfidence?: number;
+  sourceType?: 'file' | 'url';
+  sourceUrl?: string;
+  extractionQuality?: 'High' | 'Medium' | 'Low';
   detectedSections: {
     summary?: string;
     experience?: string;
@@ -251,6 +264,11 @@ export interface AnalysisRecord {
   extractedResumeText?: string;
   fileMimeType?: string;
   ocrUsed: boolean;
+  ocrConfidence?: number;
+  extractionMethod?: string;
+  extractionQuality?: 'High' | 'Medium' | 'Low';
+  sourceType?: 'file' | 'url';
+  sourceUrl?: string;
   detectedLanguage: string;
   isCachedParse: boolean;
   isDemoMode?: boolean;

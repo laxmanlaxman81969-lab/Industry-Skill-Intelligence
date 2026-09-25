@@ -61,6 +61,7 @@ app.get('/api/health', (_req, res) => {
 
 // Mount AI Skill Analyzer Routes
 app.use('/api/skill-analyzer', skillAnalyzerRouter);
+app.use('/api/resume', skillAnalyzerRouter);
 app.use('/api/roadmaps', roadmapRouter);
 app.use('/api/roadmap', roadmapRouter);
 app.use('/api/skills', (req, res, next) => {
