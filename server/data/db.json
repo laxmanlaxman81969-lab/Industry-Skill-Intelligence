@@ -3643,6 +3643,27 @@
       "detectedLanguage": "English",
       "isLanguageSupported": true,
       "parsedAt": "2026-09-25T06:42:32.545Z"
+    },
+    "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8": {
+      "fileHash": "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8",
+      "fileName": "David_Smith_Resume.txt",
+      "fileSize": 443,
+      "fileMimeType": "text/plain",
+      "extractedText": "DAVID SMITH\nEmail: david.smith@example.com | Phone: +1-555-0188\n\nSUMMARY\nFull Stack Engineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker.\n\nSKILLS\nJava, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript\n\nEXPERIENCE\nSoftware Engineer - TechCorp (2022-Present)\n- Developed Spring Boot microservices.\n- Designed relational schemas in PostgreSQL.\n\nEDUCATION\nB.S. in Computer Science - 2022",
+      "wordCount": 59,
+      "extractionMethod": "text-direct",
+      "ocrUsed": false,
+      "sourceType": "file",
+      "extractionQuality": "Medium",
+      "detectedSections": {
+        "summary": "Full Stack Engineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker.",
+        "skills": "Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript",
+        "experience": "Software Engineer - TechCorp (2022-Present)\n- Developed Spring Boot microservices.\n- Designed relational schemas in PostgreSQL.",
+        "education": "B.S. in Computer Science - 2022"
+      },
+      "detectedLanguage": "English",
+      "isLanguageSupported": true,
+      "parsedAt": "2026-09-25T09:31:26.376Z"
     }
   },
   "extractions": {
@@ -6027,6 +6048,135 @@
         "languages": []
       },
       "createdAt": "2026-09-25T06:42:32.566Z"
+    },
+    "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8": {
+      "fileHash": "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8",
+      "extraction": {
+        "extractionVersion": 2,
+        "candidateName": "DAVID SMITH",
+        "contactInfo": {
+          "email": "david.smith@example.com",
+          "phone": "",
+          "location": ""
+        },
+        "summary": "Full Stack Engineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker.",
+        "totalYearsExperience": 4,
+        "currentRole": "Software Engineer - TechCorp",
+        "workHistory": [],
+        "education": [
+          {
+            "degree": "Computer Science - 2022",
+            "institution": "",
+            "year": "2022"
+          }
+        ],
+        "certifications": [],
+        "projects": [],
+        "skillsClaimed": [
+          {
+            "skill": "Java",
+            "originalSkill": "Java",
+            "normalizedSkill": "Java",
+            "evidenceSnippet": "ngineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SK",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring Boot",
+            "originalSkill": "Spring Boot",
+            "normalizedSkill": "Spring Boot",
+            "evidenceSnippet": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Sp",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "REST API",
+            "originalSkill": "REST APIs",
+            "normalizedSkill": "REST API",
+            "evidenceSnippet": "Docker. SKILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "SQL",
+            "originalSkill": "SQL",
+            "normalizedSkill": "SQL",
+            "evidenceSnippet": "ILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, Type",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Microservices",
+            "originalSkill": "microservices",
+            "normalizedSkill": "Microservices",
+            "evidenceSnippet": "2-Present) - Developed Spring Boot microservices. - Designed relational schemas in PostgreSQL",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Git",
+            "originalSkill": "Git",
+            "normalizedSkill": "Git",
+            "evidenceSnippet": "EST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Softwa",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Docker",
+            "originalSkill": "Docker",
+            "normalizedSkill": "Docker",
+            "evidenceSnippet": "a, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Boot, REST APIs, SQL,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "TypeScript",
+            "originalSkill": "TypeScript",
+            "normalizedSkill": "TypeScript",
+            "evidenceSnippet": "greSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Software Engineer - TechCorp (20",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring",
+            "originalSkill": "Spring",
+            "normalizedSkill": "Spring",
+            "evidenceSnippet": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Jav",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "PostgreSQL",
+            "originalSkill": "PostgreSQL",
+            "normalizedSkill": "PostgreSQL",
+            "evidenceSnippet": "ience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Boot, REST API",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "React",
+            "originalSkill": "React",
+            "normalizedSkill": "React",
+            "evidenceSnippet": "s experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Bo",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          }
+        ],
+        "achievements": [],
+        "languages": []
+      },
+      "createdAt": "2026-09-25T09:31:26.487Z"
     }
   },
   "analyses": {
@@ -15019,6 +15169,462 @@
       "isDemoMode": false,
       "createdAt": "2026-09-25T06:42:32.581Z",
       "updatedAt": "2026-09-25T06:42:32.581Z"
+    },
+    "an-1790328686477-e5326baf": {
+      "analysisId": "an-1790328686477-e5326baf",
+      "userId": "david.smith@example.com",
+      "fileHash": "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8",
+      "fileName": "David_Smith_Resume.txt",
+      "fileSize": 443,
+      "roleId": "java-backend-developer",
+      "roleName": "Java Backend Developer",
+      "taxonomyVersion": "2026.3.1",
+      "benchmarkRefreshDate": "2026-03-01",
+      "status": "COMPLETED",
+      "confidenceRating": "Low",
+      "confidenceExplanation": "Low confidence analysis — limited reliable resume evidence was available.",
+      "warnings": [
+        "Claude API key not configured in .env — using deterministic server extraction engine.",
+        "Low confidence analysis — limited reliable resume evidence was available."
+      ],
+      "scoreBreakdown": {
+        "overallScore": 100,
+        "skillCoverage": 31,
+        "depthOfExperience": 22,
+        "practicalEvidence": 0,
+        "educationCertification": 10,
+        "calculationExplanation": {
+          "skillCoverageFormula": "(53 matched core weight / 68 total taxonomy core weight) × 40 = 31 / 40 pts",
+          "depthFormula": "Explicit evidence (10/10 pts) + Experience duration (10/10 pts) + Seniority signals (2/5 pts) = 22 / 25 pts",
+          "practicalFormula": "(0 practically verified in projects & work history / 6 total matched skills) × 20 = 0 / 20 pts",
+          "educationFormula": "Accredited degree relevance (10/10 pts) + Professional certifications (0/5 pts) = 10 / 15 pts"
+        }
+      },
+      "atsScore": {
+        "score": 53,
+        "status": "Needs Optimization",
+        "contactInfoScore": 7,
+        "structureScore": 8,
+        "sectionClarityScore": 7,
+        "skillsPresentationScore": 10,
+        "experienceClarityScore": 5,
+        "projectClarityScore": 0,
+        "educationScore": 8,
+        "formattingScore": 4,
+        "readabilityScore": 4,
+        "sectionsPassed": [
+          {
+            "name": "Contact & Header",
+            "passed": true
+          },
+          {
+            "name": "Technical Skills Section",
+            "passed": true
+          },
+          {
+            "name": "Projects / Work Experience",
+            "passed": false
+          },
+          {
+            "name": "Education & Credentials",
+            "passed": true
+          }
+        ],
+        "strengths": [
+          "Explicit, well-organized technical skills section."
+        ],
+        "issues": [
+          "Incomplete contact details (ensure email, phone, and city/location are present).",
+          "Add 1-2 detailed portfolio projects highlighting backend technologies."
+        ],
+        "parsingRisks": [
+          "Document is very short (under 150 words). May be missing details."
+        ],
+        "formattingRecommendations": [
+          "Use standard, clean single-column formatting for optimal ATS parsing."
+        ]
+      },
+      "skillGapScore": {
+        "score": 100,
+        "status": "High Match",
+        "requiredSkillsTotal": 8,
+        "requiredSkillsMatched": 6,
+        "preferredSkillsTotal": 3,
+        "preferredSkillsMatched": 0,
+        "criticalMissingCount": 1,
+        "partialMatchesCount": 5,
+        "matchPercentage": 100,
+        "explanation": "6 of 8 required skills matched (5 partial). 1 critical skills missing."
+      },
+      "matchedSkills": [
+        {
+          "skill": "Java",
+          "normalizedSkill": "Java",
+          "taxonomyWeight": 10,
+          "confidence": "explicit",
+          "evidenceQuote": "ngineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SK",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Language"
+        },
+        {
+          "skill": "Spring Boot",
+          "normalizedSkill": "Spring Boot",
+          "taxonomyWeight": 10,
+          "confidence": "explicit",
+          "evidenceQuote": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Sp",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "REST APIs",
+          "normalizedSkill": "REST APIs",
+          "taxonomyWeight": 9,
+          "confidence": "explicit",
+          "evidenceQuote": "Docker. SKILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React,",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "SQL",
+          "normalizedSkill": "SQL",
+          "taxonomyWeight": 9,
+          "confidence": "explicit",
+          "evidenceQuote": "ILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, Type",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Database"
+        },
+        {
+          "skill": "Microservices",
+          "normalizedSkill": "Microservices",
+          "taxonomyWeight": 8,
+          "confidence": "explicit",
+          "evidenceQuote": "2-Present) - Developed Spring Boot microservices. - Designed relational schemas in PostgreSQL",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Backend"
+        },
+        {
+          "skill": "Git",
+          "normalizedSkill": "Git",
+          "taxonomyWeight": 7,
+          "confidence": "explicit",
+          "evidenceQuote": "EST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Softwa",
+          "practicalEvidence": false,
+          "sourceSection": "Technical Skills",
+          "category": "Tools"
+        }
+      ],
+      "missingSkills": [
+        {
+          "skill": "JPA / Hibernate",
+          "normalizedSkill": "JPA / Hibernate",
+          "taxonomyWeight": 8,
+          "severity": "Critical",
+          "whyItMatters": "Object-Relational Mapping, entity lifecycle, JPQL queries, and N+1 query mitigation.",
+          "category": "Backend",
+          "roadmapAction": "Learn JPA / Hibernate"
+        },
+        {
+          "skill": "Backend Testing (JUnit/Mockito)",
+          "normalizedSkill": "Backend Testing (JUnit/Mockito)",
+          "taxonomyWeight": 7,
+          "severity": "Important",
+          "whyItMatters": "Unit testing, mocking interfaces, assertion coverage, and regression prevention.",
+          "category": "Tools",
+          "roadmapAction": "Learn Backend Testing (JUnit/Mockito)"
+        }
+      ],
+      "partialSkills": [
+        {
+          "skill": "Java",
+          "normalizedSkill": "Java",
+          "taxonomyWeight": 10,
+          "evidenceQuote": "ngineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SK",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring Java.",
+          "category": "Language"
+        },
+        {
+          "skill": "Spring Boot",
+          "normalizedSkill": "Spring Boot",
+          "taxonomyWeight": 10,
+          "evidenceQuote": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Sp",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring Spring Boot.",
+          "category": "Backend"
+        },
+        {
+          "skill": "REST APIs",
+          "normalizedSkill": "REST APIs",
+          "taxonomyWeight": 9,
+          "evidenceQuote": "Docker. SKILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React,",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring REST APIs.",
+          "category": "Backend"
+        },
+        {
+          "skill": "SQL",
+          "normalizedSkill": "SQL",
+          "taxonomyWeight": 9,
+          "evidenceQuote": "ILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, Type",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring SQL.",
+          "category": "Database"
+        },
+        {
+          "skill": "Microservices",
+          "normalizedSkill": "Microservices",
+          "taxonomyWeight": 8,
+          "evidenceQuote": "2-Present) - Developed Spring Boot microservices. - Designed relational schemas in PostgreSQL",
+          "reason": "Skill listed in resume but lacks hands-on project or work experience evidence.",
+          "recommendedImprovement": "Implement a production-grade portfolio project featuring Microservices.",
+          "category": "Backend"
+        }
+      ],
+      "uncertainSkills": [],
+      "irrelevantSkills": [
+        {
+          "skill": "TypeScript",
+          "evidenceQuote": "greSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Software Engineer - TechCorp (20",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "Spring",
+          "evidenceQuote": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Jav",
+          "confidence": "explicit"
+        },
+        {
+          "skill": "React",
+          "evidenceQuote": "s experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Bo",
+          "confidence": "explicit"
+        }
+      ],
+      "whatToLearnNext": [
+        {
+          "skill": "JPA / Hibernate",
+          "severity": "Critical",
+          "priority": 1,
+          "roadmapSkill": "JPA / Hibernate",
+          "actionDescription": "Master JPA / Hibernate: Object-Relational Mapping, entity lifecycle, JPQL queries, and N+1 query mitigation."
+        },
+        {
+          "skill": "Backend Testing (JUnit/Mockito)",
+          "severity": "Important",
+          "priority": 2,
+          "roadmapSkill": "Backend Testing (JUnit/Mockito)",
+          "actionDescription": "Master Backend Testing (JUnit/Mockito): Unit testing, mocking interfaces, assertion coverage, and regression prevention."
+        },
+        {
+          "skill": "Java",
+          "severity": "Important",
+          "priority": 3,
+          "roadmapSkill": "Java",
+          "actionDescription": "Strengthen Java: Implement a production-grade portfolio project featuring Java."
+        },
+        {
+          "skill": "Spring Boot",
+          "severity": "Important",
+          "priority": 4,
+          "roadmapSkill": "Spring Boot",
+          "actionDescription": "Strengthen Spring Boot: Implement a production-grade portfolio project featuring Spring Boot."
+        },
+        {
+          "skill": "REST APIs",
+          "severity": "Important",
+          "priority": 5,
+          "roadmapSkill": "REST APIs",
+          "actionDescription": "Strengthen REST APIs: Implement a production-grade portfolio project featuring REST APIs."
+        },
+        {
+          "skill": "SQL",
+          "severity": "Important",
+          "priority": 6,
+          "roadmapSkill": "SQL",
+          "actionDescription": "Strengthen SQL: Implement a production-grade portfolio project featuring SQL."
+        }
+      ],
+      "candidateName": "DAVID SMITH",
+      "extractionSummary": {
+        "totalYearsExperience": 4,
+        "educationSummary": "Computer Science - 2022 from ",
+        "projectCount": 0,
+        "certificationsCount": 0,
+        "totalClaimedSkills": 11,
+        "verifiedSkillsCount": 11
+      },
+      "structuredExtraction": {
+        "extractionVersion": 2,
+        "candidateName": "DAVID SMITH",
+        "contactInfo": {
+          "email": "david.smith@example.com",
+          "phone": "",
+          "location": ""
+        },
+        "summary": "Full Stack Engineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker.",
+        "totalYearsExperience": 4,
+        "currentRole": "Software Engineer - TechCorp",
+        "workHistory": [],
+        "education": [
+          {
+            "degree": "Computer Science - 2022",
+            "institution": "",
+            "year": "2022"
+          }
+        ],
+        "certifications": [],
+        "projects": [],
+        "skillsClaimed": [
+          {
+            "skill": "Java",
+            "originalSkill": "Java",
+            "normalizedSkill": "Java",
+            "evidenceSnippet": "ngineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SK",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring Boot",
+            "originalSkill": "Spring Boot",
+            "normalizedSkill": "Spring Boot",
+            "evidenceSnippet": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Sp",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "REST API",
+            "originalSkill": "REST APIs",
+            "normalizedSkill": "REST API",
+            "evidenceSnippet": "Docker. SKILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "SQL",
+            "originalSkill": "SQL",
+            "normalizedSkill": "SQL",
+            "evidenceSnippet": "ILLS Java, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, Type",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Microservices",
+            "originalSkill": "microservices",
+            "normalizedSkill": "Microservices",
+            "evidenceSnippet": "2-Present) - Developed Spring Boot microservices. - Designed relational schemas in PostgreSQL",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Git",
+            "originalSkill": "Git",
+            "normalizedSkill": "Git",
+            "evidenceSnippet": "EST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Softwa",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Docker",
+            "originalSkill": "Docker",
+            "normalizedSkill": "Docker",
+            "evidenceSnippet": "a, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Boot, REST APIs, SQL,",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "TypeScript",
+            "originalSkill": "TypeScript",
+            "normalizedSkill": "TypeScript",
+            "evidenceSnippet": "greSQL, Docker, Git, Maven, React, TypeScript EXPERIENCE Software Engineer - TechCorp (20",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "Spring",
+            "originalSkill": "Spring",
+            "normalizedSkill": "Spring",
+            "evidenceSnippet": "r with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Jav",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "PostgreSQL",
+            "originalSkill": "PostgreSQL",
+            "normalizedSkill": "PostgreSQL",
+            "evidenceSnippet": "ience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Boot, REST API",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          },
+          {
+            "skill": "React",
+            "originalSkill": "React",
+            "normalizedSkill": "React",
+            "evidenceSnippet": "s experience in Java, Spring Boot, React, PostgreSQL, Docker. SKILLS Java, Spring Bo",
+            "confidence": "explicit",
+            "verifiedInText": true,
+            "hasPracticalEvidence": false
+          }
+        ],
+        "achievements": [],
+        "languages": []
+      },
+      "extractedResumeText": "DAVID SMITH\nEmail: david.smith@example.com | Phone: +1-555-0188\n\nSUMMARY\nFull Stack Engineer with 4 years experience in Java, Spring Boot, React, PostgreSQL, Docker.\n\nSKILLS\nJava, Spring Boot, REST APIs, SQL, PostgreSQL, Docker, Git, Maven, React, TypeScript\n\nEXPERIENCE\nSoftware Engineer - TechCorp (2022-Present)\n- Developed Spring Boot microservices.\n- Designed relational schemas in PostgreSQL.\n\nEDUCATION\nB.S. in Computer Science - 2022",
+      "fileMimeType": "text/plain",
+      "ocrUsed": false,
+      "extractionMethod": "text-direct",
+      "extractionQuality": "Medium",
+      "sourceType": "file",
+      "detectedLanguage": "English",
+      "isCachedParse": true,
+      "isDemoMode": false,
+      "createdAt": "2026-09-25T09:31:26.500Z",
+      "updatedAt": "2026-09-25T09:31:26.500Z",
+      "opportunityId": "job-001",
+      "opportunityTitle": "Junior Java Backend Developer",
+      "opportunityCompany": "ABC Technologies",
+      "opportunityRequiredSkills": [
+        "Java",
+        "Spring Boot",
+        "SQL",
+        "REST API",
+        "JPA/Hibernate",
+        "Git",
+        "Docker",
+        "Maven"
+      ],
+      "opportunityPreferredSkills": [
+        "Docker",
+        "Microservices",
+        "Redis",
+        "AWS"
+      ],
+      "opportunityDescription": "Join our Core Banking Microservices team. You will build high-concurrency Spring Boot REST services, optimize relational queries, and integrate with message brokers.",
+      "opportunityMatchedSkills": [
+        "Java",
+        "Spring Boot",
+        "SQL",
+        "REST API",
+        "Git",
+        "Docker"
+      ],
+      "opportunityMissingSkills": [
+        "JPA/Hibernate",
+        "Maven"
+      ],
+      "opportunityPartialSkills": []
     }
   },
   "userAnalysisHistory": {
@@ -15074,6 +15680,9 @@
     "michael.chang@example.com": [
       "an-1790318552558-32c129b6",
       "an-1790318542502-852f471e"
+    ],
+    "david.smith@example.com": [
+      "an-1790328686477-e5326baf"
     ]
   },
   "llmLogs": [],
@@ -15363,6 +15972,26 @@
       "experienceCount": 0,
       "analysisIds": [
         "an-1790318552558-32c129b6"
+      ]
+    },
+    "resume-662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8-david.smith@example.com": {
+      "resumeId": "resume-662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8-david.smith@example.com",
+      "userId": "david.smith@example.com",
+      "fileHash": "662fa15f872814187f4058d446cb198bea5edb6cdaeca003da51ddd6df5ecda8",
+      "fileName": "David_Smith_Resume.txt",
+      "fileSize": 443,
+      "fileMimeType": "text/plain",
+      "uploadedAt": "2026-09-25T09:31:26.508Z",
+      "lastAnalyzedAt": "2026-09-25T09:31:26.508Z",
+      "latestAnalysisId": "an-1790328686477-e5326baf",
+      "latestAtsScore": 53,
+      "latestSkillGapScore": 100,
+      "candidateName": "DAVID SMITH",
+      "detectedSkillsCount": 11,
+      "projectCount": 0,
+      "experienceCount": 0,
+      "analysisIds": [
+        "an-1790328686477-e5326baf"
       ]
     }
   },

@@ -7638,16 +7638,16 @@ if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
     console.log(`=======================================================`);
   });
 }
-var server_default = app;
+var index_default = app;
 
-// api/index.ts
+// server/apiEntry.ts
 var config = {
   api: {
     bodyParser: false
   }
 };
-var index_default = server_default;
+var apiEntry_default = index_default;
 export {
   config,
-  index_default as default
+  apiEntry_default as default
 };

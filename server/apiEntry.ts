@@ -1,4 +1,4 @@
-import app from '../server/index';
+import app from './index';
 
 // Disable default body parser in Vercel to allow Multer and streaming request handling
 export const config = {
