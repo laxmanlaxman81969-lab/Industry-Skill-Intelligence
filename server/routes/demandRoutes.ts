@@ -56,7 +56,7 @@ demandRouter.get('/skills', (req: Request, res: Response) => {
  */
 demandRouter.get('/skills/:skillId', (req: Request, res: Response) => {
   try {
-    const skill = engine.getSkillById(req.params.skillId);
+    const skill = engine.getSkillById(String(req.params.skillId));
     if (!skill) {
       return res.status(404).json({ success: false, error: 'Skill not found in demand database.' });
     }

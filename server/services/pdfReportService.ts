@@ -1,7 +1,6 @@
 // Real PDF Report Generator using pdf-lib
 // Generates official, downloadable PDF reports directly from the stored analysis record
 
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { AnalysisRecord } from '../types';
 
 function cleanPdfText(text: string): string {
@@ -13,6 +12,7 @@ function cleanPdfText(text: string): string {
 
 export class PDFReportService {
   public static async generateReport(analysis: AnalysisRecord): Promise<Uint8Array> {
+    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]); // A4 format
     const { width, height } = page.getSize();

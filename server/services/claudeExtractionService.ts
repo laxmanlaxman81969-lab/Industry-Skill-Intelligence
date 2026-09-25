@@ -33,7 +33,7 @@ export class ClaudeExtractionService {
     if (!this.anthropic && this.apiKey) {
       try {
         const mod = await import('@anthropic-ai/sdk');
-        const AnthropicClass = mod.default || mod;
+        const AnthropicClass: any = mod.default || mod;
         this.anthropic = new AnthropicClass({ apiKey: this.apiKey });
       } catch (e) {
         console.warn('[Claude] Could not load @anthropic-ai/sdk:', e);

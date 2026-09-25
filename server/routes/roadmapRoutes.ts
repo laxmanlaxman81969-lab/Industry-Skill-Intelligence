@@ -209,7 +209,7 @@ roadmapRouter.post('/recalculate', (req: Request, res: Response) => {
  * GET /api/roadmaps/:slug
  */
 roadmapRouter.get('/:slug', (req: Request, res: Response) => {
-  const roadmap = getRoadmapBySlug(req.params.slug);
+  const roadmap = getRoadmapBySlug(String(req.params.slug));
   if (!roadmap) return res.status(404).json({ success: false, error: 'Roadmap not found.' });
   const userId = userIdFromRequest(req);
   const progress = userId ? db.getRoadmapProgress(userId, roadmap.id) : null;
@@ -234,8 +234,8 @@ roadmapRouter.get('/:slug', (req: Request, res: Response) => {
  * GET /api/roadmaps/:slug/topic/:topicId
  */
 roadmapRouter.get('/:slug/topic/:topicId', (req: Request, res: Response) => {
-  const roadmap = getRoadmapBySlug(req.params.slug);
-  const topic = roadmap?.modules.flatMap((module) => module.topics).find((item) => item.id === req.params.topicId);
+  const roadmap = getRoadmapBySlug(String(req.params.slug));
+  const topic = roadmap?.modules.flatMap((module) => module.topics).find((item) => item.id === String(req.params.topicId));
   if (!roadmap || !topic) return res.status(404).json({ success: false, error: 'Topic not found.' });
   res.json({ success: true, technology: roadmap.name, topic });
 });
@@ -245,7 +245,7 @@ roadmapRouter.get('/:slug/topic/:topicId', (req: Request, res: Response) => {
  */
 roadmapRouter.post('/:slug/progress', (req: Request, res: Response) => {
   const userId = userIdFromRequest(req);
-  const roadmap = getRoadmapBySlug(req.params.slug);
+  const roadmap = getRoadmapBySlug(String(req.params.slug));
   if (!userId) return res.status(401).json({ success: false, error: 'Authenticated user is required.' });
   if (!roadmap) return res.status(404).json({ success: false, error: 'Roadmap not found.' });
   const current = db.getRoadmapProgress(userId, roadmap.id);

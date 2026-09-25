@@ -117,7 +117,7 @@ interviewRouter.post('/submit', (req: Request, res: Response) => {
 interviewRouter.get('/student/:studentId', (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
-    const list = db.getInterviewsByStudent(studentId);
+    const list = db.getInterviewsByStudent(String(studentId));
     return res.json({
       success: true,
       count: list.length,
@@ -135,7 +135,7 @@ interviewRouter.get('/student/:studentId', (req: Request, res: Response) => {
 interviewRouter.get('/:id', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const interview = db.getInterviewById(id);
+    const interview = db.getInterviewById(String(id));
 
     if (!interview) {
       return res.status(404).json({ success: false, error: 'Interview not found' });

@@ -17,6 +17,7 @@ export const skillAnalyzerRouter = Router();
 
 // Configure Multer for in-memory file uploads (max 10MB)
 const upload = multer({
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = (file.originalname.split('.').pop() || '').toLowerCase();
@@ -147,7 +148,7 @@ skillAnalyzerRouter.get('/roles', (_req: Request, res: Response) => {
 
 // 3. GET /api/skill-analyzer/taxonomy/:roleId
 skillAnalyzerRouter.get('/taxonomy/:roleId', (req: Request, res: Response) => {
-  const taxonomy = db.getTaxonomyByRoleId(req.params.roleId);
+  const taxonomy = db.getTaxonomyByRoleId(String(req.params.roleId));
   if (!taxonomy) {
     return res.status(404).json({ success: false, error: 'Role taxonomy not found.' });
   }
@@ -162,7 +163,7 @@ skillAnalyzerRouter.get('/opportunities', (_req: Request, res: Response) => {
 
 // 3c. GET /api/skill-analyzer/opportunities/:id
 skillAnalyzerRouter.get('/opportunities/:id', (req: Request, res: Response) => {
-  const opportunity = db.getOpportunityById(req.params.id);
+  const opportunity = db.getOpportunityById(String(req.params.id));
   if (!opportunity) {
     return res.status(404).json({ success: false, error: 'Opportunity not found.' });
   }
@@ -309,7 +310,7 @@ async function executeAnalysisPipeline(params: {
     extraction = claudeResult.extraction;
     claudeResultWarnings = claudeResult.warnings;
     db.saveExtraction(parsedDoc.fileHash, extraction);
-  } else {
+  } else if (extraction) {
     extraction = claudeService.validateAndVerifyEvidence(extraction, parsedDoc.extractedText);
     db.saveExtraction(parsedDoc.fileHash, extraction);
   }
@@ -659,7 +660,7 @@ skillAnalyzerRouter.post('/recompare', async (req: Request, res: Response) => {
 
 // 7. GET /api/skill-analyzer/analysis/:analysisId
 skillAnalyzerRouter.get('/analysis/:analysisId', (req: Request, res: Response) => {
-  const analysis = db.getAnalysisById(req.params.analysisId);
+  const analysis = db.getAnalysisById(String(req.params.analysisId));
   if (!analysis) {
     return res.status(404).json({ success: false, error: 'Analysis record not found.' });
   }
@@ -680,7 +681,7 @@ skillAnalyzerRouter.get('/history', (req: Request, res: Response) => {
 // 9. GET /api/skill-analyzer/analysis/:analysisId/report
 skillAnalyzerRouter.get('/analysis/:analysisId/report', async (req: Request, res: Response) => {
   try {
-    const analysis = db.getAnalysisById(req.params.analysisId);
+    const analysis = db.getAnalysisById(String(req.params.analysisId));
     if (!analysis) {
       return res.status(404).json({ success: false, error: 'Analysis not found.' });
     }
@@ -709,23 +710,23 @@ skillAnalyzerRouter.get('/resumes', (req: Request, res: Response) => {
 // 11. GET /api/skill-analyzer/resume/:fileHash  — Single resume record + all its analyses
 skillAnalyzerRouter.get('/resume/:fileHash', (req: Request, res: Response) => {
   const userId = (req.query.userId as string) || 'default_user';
-  const record = db.getResumeRecordByHash(req.params.fileHash, userId);
+  const record = db.getResumeRecordByHash(String(req.params.fileHash), userId);
   if (!record) {
     return res.status(404).json({ success: false, error: 'Resume record not found.' });
   }
-  const analyses = db.getAnalysesByFileHash(req.params.fileHash);
+  const analyses = db.getAnalysesByFileHash(String(req.params.fileHash));
   res.json({ success: true, resume: record, analyses });
 });
 
 // 12. GET /api/skill-analyzer/resume/:fileHash/analyses  — Just the analyses list
 skillAnalyzerRouter.get('/resume/:fileHash/analyses', (req: Request, res: Response) => {
-  const analyses = db.getAnalysesByFileHash(req.params.fileHash);
+  const analyses = db.getAnalysesByFileHash(String(req.params.fileHash));
   res.json({ success: true, analyses, count: analyses.length });
 });
 
 // 13. DELETE /api/skill-analyzer/resume/:resumeId
 skillAnalyzerRouter.delete('/resume/:resumeId', (req: Request, res: Response) => {
-  const deleted = db.deleteResumeRecord(req.params.resumeId);
+  const deleted = db.deleteResumeRecord(String(req.params.resumeId));
   if (!deleted) {
     return res.status(404).json({ success: false, error: 'Resume record not found.' });
   }
