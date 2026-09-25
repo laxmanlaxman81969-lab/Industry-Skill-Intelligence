@@ -1437,25 +1437,38 @@ var FileParserService = class _FileParserService {
         }
       } else if (detectedType === "pdf") {
         if (onStatusUpdate) onStatusUpdate("Extracting PDF text...");
-        let parser = null;
         try {
-          const PDFParserClass = await getPDFParser();
-          parser = new PDFParserClass({ data: buffer });
-          const pdfData = await parser.getText();
-          rawText = pdfData?.text || "";
-          extractionMethod = "pdf-parse";
-        } catch (pdfErr) {
-          const errMsg = (pdfErr?.message || "").toLowerCase();
-          if (errMsg.includes("password") || errMsg.includes("encrypted") || errMsg.includes("needpassword")) {
-            throw new Error("This file is password protected and cannot be processed.");
+          const streamText = this.extractPdfTextStream(buffer);
+          if (this.isPdfTextSufficient(streamText)) {
+            rawText = streamText;
+            extractionMethod = "pdf-parse";
           }
-          console.warn("[Parser] Standard PDF extraction failed, attempting OCR fallback:", pdfErr);
-          rawText = "";
-        } finally {
-          if (parser && typeof parser.destroy === "function") {
-            try {
-              await parser.destroy();
-            } catch {
+        } catch (streamErr) {
+          console.warn("[Parser] Stream PDF extraction failed, falling back:", streamErr);
+        }
+        if (!this.isPdfTextSufficient(rawText)) {
+          let parser = null;
+          try {
+            const PDFParserClass = await getPDFParser();
+            parser = new PDFParserClass({ data: buffer });
+            const pdfData = await parser.getText();
+            const parsedText = pdfData?.text || "";
+            if (parsedText.trim().length > rawText.trim().length) {
+              rawText = parsedText;
+              extractionMethod = "pdf-parse";
+            }
+          } catch (pdfErr) {
+            const errMsg = (pdfErr?.message || "").toLowerCase();
+            if (errMsg.includes("password") || errMsg.includes("encrypted") || errMsg.includes("needpassword")) {
+              throw new Error("This file is password protected and cannot be processed.");
+            }
+            console.warn("[Parser] Standard PDF extraction failed, attempting OCR fallback:", pdfErr);
+          } finally {
+            if (parser && typeof parser.destroy === "function") {
+              try {
+                await parser.destroy();
+              } catch {
+              }
             }
           }
         }
@@ -1524,6 +1537,75 @@ var FileParserService = class _FileParserService {
       document: doc,
       isCached: false
     };
+  }
+  /**
+   * Pure Node.js streaming PDF text extractor using built-in zlib.
+   * Decodes literal ASCII, hex strings, and TJ arrays from FlateDecode streams.
+   * Requires zero native dependencies, zero external processes, and zero network calls.
+   */
+  extractPdfTextStream(buffer) {
+    const extractedLines = [];
+    let startIdx = 0;
+    while (startIdx < buffer.length) {
+      const streamPos = buffer.indexOf("stream", startIdx);
+      if (streamPos === -1) break;
+      let dataStart = streamPos + 6;
+      if (buffer[dataStart] === 13 && buffer[dataStart + 1] === 10) dataStart += 2;
+      else if (buffer[dataStart] === 10 || buffer[dataStart] === 13) dataStart += 1;
+      const endPos = buffer.indexOf("endstream", dataStart);
+      if (endPos === -1) break;
+      const slice = buffer.subarray(dataStart, endPos);
+      let decomp;
+      try {
+        decomp = zlib.inflateSync(slice);
+      } catch {
+        try {
+          decomp = zlib.inflateRawSync(slice);
+        } catch {
+          decomp = slice;
+        }
+      }
+      const str = decomp.toString("latin1");
+      const literalTj = /\(([^)]*)\)\s*(?:Tj|'|")/g;
+      let m;
+      while ((m = literalTj.exec(str)) !== null) {
+        const clean = m[1].replace(/\\([()\\])/g, "$1").trim();
+        if (clean) extractedLines.push(clean);
+      }
+      const hexTj = /<([0-9a-fA-F]+)>\s*(?:Tj|'|")/g;
+      while ((m = hexTj.exec(str)) !== null) {
+        const hex = m[1];
+        let decoded = "";
+        for (let i = 0; i < hex.length; i += 2) {
+          decoded += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        }
+        decoded = decoded.replace(/\0/g, "").trim();
+        if (decoded) extractedLines.push(decoded);
+      }
+      const arrayTj = /\[([\s\S]*?)\]\s*TJ/g;
+      while ((m = arrayTj.exec(str)) !== null) {
+        const arrayContent = m[1];
+        const pieces = [];
+        const itemRegex = /(?:\(([^)]*)\)|<([0-9a-fA-F]+)>)/g;
+        let im;
+        while ((im = itemRegex.exec(arrayContent)) !== null) {
+          if (im[1] !== void 0) {
+            pieces.push(im[1].replace(/\\([()\\])/g, "$1"));
+          } else if (im[2] !== void 0) {
+            const hex = im[2];
+            let dec = "";
+            for (let i = 0; i < hex.length; i += 2) {
+              dec += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            }
+            pieces.push(dec.replace(/\0/g, ""));
+          }
+        }
+        const combined = pieces.join(" ").trim();
+        if (combined) extractedLines.push(combined);
+      }
+      startIdx = endPos + 9;
+    }
+    return extractedLines.join("\n");
   }
   /**
    * PDF quality verification to determine if OCR is required.
